@@ -98,7 +98,10 @@ def read_card(filename):
     data_dict["Checksum_2"] = [pretty_bytes(f.read(2)), False]
     data_dict["Store Name"] = [(f.read(32).rstrip(b'\x00')).decode('shift-jis'), True]
     config_flag_1 = pretty_bytes(f.read(1))
-    data_dict["Wheel Sensitivity"] = [int(config_flag_1[3]), True]
+    if config_flag_1[3] == 'a':
+        data_dict["Wheel Sensitivity"] = [10, True]
+    else:
+        data_dict["Wheel Sensitivity"] = [int(config_flag_1[3]), True]
     data_dict["BGM Volume"] = [bgm_volume_list[int(config_flag_1[2])], True]
     config_flag_2 = pretty_bytes(f.read(1))
     config_flag_3 = bin(int.from_bytes(f.read(1), byteorder="little"))[2:].zfill(8)
@@ -285,7 +288,10 @@ def write_card(filename, data_dict):
 
     config_flag_1 = ''
     config_flag_1 += str(bgm_volume_list.index(data_dict["BGM Volume"][0]))
-    config_flag_1 += str(data_dict["Wheel Sensitivity"][0])
+    if int(data_dict["Wheel Sensitivity"][0]) == 10:
+        config_flag_1 += 'a'
+    else:
+        config_flag_1 += str(data_dict["Wheel Sensitivity"][0])
     f.write(safe_bytes(config_flag_1, 1))
     config_flag_2 = f.read(1)
 
@@ -353,7 +359,7 @@ def write_card(filename, data_dict):
     padding = f.read(6)
     f.write(safe_bytes(data_dict["Infinity Result Data 1"][0], 1))
     f.write(safe_bytes(data_dict["Infinity Result Data 2"][0], 1))
-    f.write(safe_bytes(data_dict["Infinity Rank"][0], 2))
+    f.write(safe_bytes(int(data_dict["Infinity Rank"][0]), 2))
     f.write(safe_bytes(data_dict["Story Progress"][0], 24))
     padding = f.read(4)
     course_dict = data_dict["Courses"][0]
