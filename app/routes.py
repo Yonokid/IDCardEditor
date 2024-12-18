@@ -4,25 +4,27 @@ from app import app
 from reader import *
 import hashlib
 import shutil
+import vercel_blob
+from dotenv import load_dotenv
 
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
+
+dotenv.load_dotenv()
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def hash_file(filename):
-    md5 = hashlib.md5()
-    with open(filename, 'rb') as f:
-        while True:
-            data = f.read()
-            if not data:
-                break
-            md5.update(data)
-        return md5.hexdigest()
+def hash_file(filepath):
+    sha256_hash = hashlib.sha256()
+    with open(filepath, "rb") as f:
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    return sha256_hash.hexdigest()
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
+
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -34,14 +36,10 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            if not os.path.exists('temp'):
-                os.makedirs('temp')
-            temp_path = os.path.join('temp', filename)
-            file.save(temp_path)
-            hashed_filename = hash_file(temp_path) + '.bin'
+            file_content = file.read()
+            hashed_filename = hashlib.sha256(file_content).hexdigest() + '.bin'
             card_path = os.path.join('app\\card', hashed_filename)
-            shutil.copy(temp_path, card_path)
-            os.remove(temp_path)
+            vercel_blob.put(card_path, file.read(), {})
             return redirect(url_for('edit_file', name=hashed_filename))
     return render_template('index.html')
 
