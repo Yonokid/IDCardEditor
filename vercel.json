@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "editor.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/editor.py" }
+  ]
+}
