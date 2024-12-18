@@ -126,7 +126,7 @@ def read_card(filename):
     padding = f.read(32)
     data_dict["Driver Name"] = [(f.read(14).rstrip(b'\x00')).decode('shift-jis'), True]
     data_dict["CRC01"] = [pretty_bytes(f.read(2)), False]
-    for i in range(3):
+    for i in range(data_dict["Number of Cars"][0]):
         car_dict = dict()
         model = int.from_bytes(f.read(1), byteorder="little")
         make = make_list[int.from_bytes(f.read(1), byteorder="little")]
@@ -149,10 +149,13 @@ def read_card(filename):
         car_dict["Numplate Plate Number"] = int.from_bytes(f.read(4), byteorder="little")
         car_dict["Customizations"] = pretty_bytes(f.read(64))
         data_dict[f"Car {i+1}"] = [car_dict, True]
+    for i in range(3 - data_dict["Number of Cars"][0]):
+        f.read(96)
     data_dict["Avatar Points"] = [int.from_bytes(f.read(1), byteorder="little"), False]
     data_dict["My Frame"] = [int.from_bytes(f.read(1), byteorder="little"), True]
     data_dict["Selected Cup"] = [cup_list[int.from_bytes(f.read(1), byteorder="little")], True]
-    data_dict["Tachometer"] = [tachometer_list[int.from_bytes(f.read(2), byteorder="little")], True]
+    data_dict["Tachometer"] = [tachometer_list[int.from_bytes(f.read(1), byteorder="little")], True]
+    padding = f.read(1)
     data_dict["Battle Stance"] = [int.from_bytes(f.read(1), byteorder="little"), True]
     data_dict["CRC11"] = [pretty_bytes(f.read(2)), False]
     padding = f.read(2)
@@ -172,10 +175,14 @@ def read_card(filename):
     data_dict["Courses"] = [course_dict, True]
     for i in range(len(courses)):
         course = courses[i]
-        model = int.from_bytes(f.read(1), byteorder="little")
-        make = make_list[int.from_bytes(f.read(1), byteorder="little")]
-        course_dict[course]["Car Make"] = make
-        course_dict[course]["Car Model"] = model_dict[make][model]
+        model = int.from_bytes(f.read(1), byteorder="little", signed=True)
+        make = make_list[int.from_bytes(f.read(1), byteorder="little", signed=True)]
+        if model == -1:
+            course_dict[course]["Car Make"] = "Not Played"
+            course_dict[course]["Car Model"] = "Not Played"
+        else:
+            course_dict[course]["Car Make"] = make
+            course_dict[course]["Car Model"] = model_dict[make][model]
     data_dict["Net VS. Plays"] = [int.from_bytes(f.read(4), byteorder="little"), False]
     data_dict["Net Wins"] = [int.from_bytes(f.read(4), byteorder="little"), False]
     padding = f.read(4)
@@ -311,7 +318,7 @@ def write_card(filename, data_dict):
     padded_name = encoded_name.ljust(14, b'\x00')
     f.write(safe_bytes(padded_name, 14))
     f.write(safe_bytes(data_dict["CRC01"][0], 2))
-    for i in range(3):
+    for i in range(data_dict["Number of Cars"][0]):
         car_dict = data_dict[f"Car {i+1}"][0]
         f.write(safe_bytes(model_dict[car_dict["Make"]].index(car_dict["Model"]), 1))
         f.write(safe_bytes(make_list.index(car_dict["Make"]), 1))
@@ -331,11 +338,13 @@ def write_card(filename, data_dict):
         f.write(safe_bytes(car_dict["Numplate Class Code"], 2))
         f.write(safe_bytes(car_dict["Numplate Plate Number"], 4))
         f.write(safe_bytes(car_dict["Customizations"], 64))
-
+    for i in range(3 - data_dict["Number of Cars"][0]):
+        f.read(96)
     f.write(safe_bytes(data_dict["Avatar Points"][0], 1))
     f.write(safe_bytes(int(data_dict["My Frame"][0]), 1))
     f.write(safe_bytes(cup_list.index(data_dict["Selected Cup"][0]), 1))
-    f.write(safe_bytes(tachometer_list.index(data_dict["Tachometer"][0]), 2))
+    f.write(safe_bytes(tachometer_list.index(data_dict["Tachometer"][0]), 1))
+    padding = f.read(1)
     f.write(safe_bytes(data_dict["Battle Stance"][0], 1))
     f.write(safe_bytes(data_dict["CRC11"][0], 2))
     padding = f.read(2)
@@ -354,8 +363,12 @@ def write_card(filename, data_dict):
         termination = f.read(1)
     for i in range(len(courses)):
         course = courses[i]
-        f.write(safe_bytes(model_dict[course_dict[course]["Car Make"]].index(course_dict[course]["Car Model"]), 1))
-        f.write(safe_bytes(make_list.index(course_dict[course]["Car Make"]), 1))
+        if course_dict[course]["Car Model"] == 'Not Played':
+            f.write(safe_bytes('0xFF', 1))
+            f.write(safe_bytes('0xFF', 1))
+        else:
+            f.write(safe_bytes(model_dict[course_dict[course]["Car Make"]].index(course_dict[course]["Car Model"]), 1))
+            f.write(safe_bytes(make_list.index(course_dict[course]["Car Make"]), 1))
     f.write(safe_bytes(data_dict["Net VS. Plays"][0], 4))
     f.write(safe_bytes(data_dict["Net Wins"][0], 4))
     padding = f.read(4)
@@ -409,8 +422,8 @@ def write_card(filename, data_dict):
         f.write(safe_bytes(data_dict[f"Parts Stocker Index {i}"][0], 2))
     for i in range(45):
         f.write(safe_bytes(data_dict[f"Parts Stocker {i}"][0], 2, signed=True))
-    f.write(safe_bytes(data_dict["Parts Stocker Position 0"][0], 1))
-    f.write(safe_bytes(data_dict["Parts Stocker Position 1"][0], 1))
+    f.write(safe_bytes(data_dict["Parts Stocker Position 0"][0], 1, signed=True))
+    f.write(safe_bytes(data_dict["Parts Stocker Position 1"][0], 1, signed=True))
     f.write(safe_bytes(data_dict["CRC21"][0], 2))
     for i in range(len(courses)):
         course = courses[i]
