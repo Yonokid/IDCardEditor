@@ -6,6 +6,7 @@ import hashlib
 from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
+app.config['SECRET_KEY'] = 'super cool secret key'
 
 byte_data = dict()
 
@@ -34,6 +35,9 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_content = file.read()
+            header = b'\x03\x36\x00\x01\x81\x41\x54\x06\xF7\x04\x16\x09\x03\x89\x03\x87'
+            if file_content[:16] != header:
+                return redirect(request.url)
             hashed_filename = hashlib.sha256(file_content).hexdigest() + '.bin'
             byte_data[hashed_filename] = file_content
             return redirect(url_for('edit_file', name=hashed_filename))
@@ -46,14 +50,13 @@ def edit_file(name):
 
 @app.route('/download/<name>', methods=["GET", "POST"])
 def download(name):
-    if request.method == "POST":
-        card = read_card(BytesIO(byte_data[name]))
-        for key in card:
-            form_value = request.form.get(f"key_{key}")
-            if form_value is not None:
-                card[key][0] = form_value
-        new_data = BytesIO(byte_data[name])
-        write_card(new_data, card)
+    card = read_card(BytesIO(byte_data[name]))
+    for key in card:
+        form_value = request.form.get(f"key_{key}")
+        if form_value is not None:
+            card[key][0] = form_value
+    new_data = BytesIO(byte_data[name])
+    write_card(new_data, card)
     new_data.seek(0)
     response = send_file(new_data, as_attachment=True, download_name='SBZZ_card.bin')
     return response
