@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <form method="post" enctype="multipart/form-data" class="p-4 bg-light rounded shadow-lg" style="background-color: #003366;">
+        <input type="file" name="file" class="form-control mb-3">
+        <input type="submit" value="Upload" class="btn btn-primary">
+    </form>
+</div>
+{% endblock %}

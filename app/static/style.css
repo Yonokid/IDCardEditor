@@ -1,0 +1,11 @@
+.parent {
+    display: flex;
+    justify-content: center; /* Horizontal center */
+    align-items: center; /* Vertical center */
+    height: 100vh; /* Full height */
+}
+
+.upload_button {
+    width: 300px;
+    height: 200px;
+}
