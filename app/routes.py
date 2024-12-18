@@ -3,13 +3,11 @@ from werkzeug.utils import secure_filename
 from app import app
 from reader import *
 import hashlib
-import shutil
-import vercel_blob
-from dotenv import load_dotenv
+from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
 
-dotenv.load_dotenv()
+byte_data = dict()
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -24,7 +22,6 @@ def hash_file(filepath):
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
-
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -38,25 +35,25 @@ def upload_file():
             filename = secure_filename(file.filename)
             file_content = file.read()
             hashed_filename = hashlib.sha256(file_content).hexdigest() + '.bin'
-            card_path = os.path.join('app\\card', hashed_filename)
-            vercel_blob.put(card_path, file.read(), {})
+            byte_data[hashed_filename] = file_content
             return redirect(url_for('edit_file', name=hashed_filename))
     return render_template('index.html')
 
 @app.route('/card/<name>')
 def edit_file(name):
-    card = read_card(f'app\\card\\{name}')
+    card = read_card(BytesIO(byte_data[name]))
     return render_template('card.html', title='Home', card=card, name=name)
 
 @app.route('/download/<name>', methods=["GET", "POST"])
 def download(name):
     if request.method == "POST":
-        card = read_card(f'app\\card\\{name}')
+        card = read_card(BytesIO(byte_data[name]))
         for key in card:
             form_value = request.form.get(f"key_{key}")
             if form_value is not None:
                 card[key][0] = form_value
-        write_card(f'app\\card\\{name}', card)
-    path = os.path.join('card', name)
-    response = send_file(path, as_attachment=True, download_name='SBZZ_card.bin')
+        new_data = BytesIO(byte_data[name])
+        write_card(new_data, card)
+    new_data.seek(0)
+    response = send_file(new_data, as_attachment=True, download_name='SBZZ_card.bin')
     return response
