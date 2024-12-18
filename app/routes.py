@@ -7,7 +7,6 @@ from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
 app.config['SECRET_KEY'] = 'super cool secret key'
-
 byte_data = dict()
 
 def allowed_file(filename):
@@ -46,7 +45,20 @@ def upload_file():
 @app.route('/card/<name>')
 def edit_file(name):
     card = read_card(BytesIO(byte_data[name]))
-    return render_template('card.html', title='Home', card=card, name=name)
+    static_data = []
+    static_data.append(read_txt('app/static/prefectures.txt'))
+    static_data.append(read_txt('app/static/avatar_gender.txt'))
+    static_data.append(read_txt('app/static/bgm_volume.txt'))
+    static_data.append(read_txt('app/static/make.txt'))
+    static_data.append(read_txt('app/static/car_prefectures.txt'))
+    static_data.append(read_txt('app/static/car_hirigana.txt'))
+    static_data.append(read_txt('app/static/courses.txt'))
+    static_data.append(read_txt('app/static/cup.txt'))
+    static_data.append(read_txt('app/static/tachometer.txt'))
+    static_data.append(read_txt('app/static/aura.txt'))
+    static_data.append(read_txt('app/static/class.txt'))
+    static_data.append(read_txt('app/static/titles.txt'))
+    return render_template('card.html', title='Home', card=card, name=name, data=static_data)
 
 @app.route('/download/<name>', methods=["GET", "POST"])
 def download(name):
