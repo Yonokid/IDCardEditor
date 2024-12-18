@@ -34,6 +34,8 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
+            if not os.path.exists('temp'):
+                os.makedirs('temp')
             temp_path = os.path.join('temp', filename)
             file.save(temp_path)
             hashed_filename = hash_file(temp_path) + '.bin'
