@@ -10,7 +10,7 @@
                     'BGM Volume': data[2],'Selected Cup': data[7],
                     'Tachometer': data[8],'Aura': data[9],
                     'Class': data[10],'Title': data[11]} %}
-                {% set disabled_map = ['Game Version','Story Progress','Avatar','Car 1','Car 2','Car 3',
+                {% set disabled_map = ['Game Version','Avatar','Car 1','Car 2','Car 3',
                                        'Courses','Store Name','Number of Cars','Play Count','Story Losses',
                                        'Story Wins','Total In-Store Plays','Total In-Store Wins','Course Proficiency'] %}
                 {% set boolean_map = ['Force Quit','Cornering Guide',
@@ -81,8 +81,13 @@
                         <tr>
                             <td>{{ course }}</td>
                             <td>{{ card['Courses'][0][course]["Time"] }}</td>
-                            <td {% if card['Courses'][0][course]["Time to Specialist"][0] == '-' %} class='text-success' {% else %} class='text-danger' {% endif %}>{{ card['Courses'][0][course]["Time to Specialist"] }}</td>
-                            <td {% if card['Courses'][0][course]["Time to Platinum"][0] == '-' %} class='text-success' {% else %} class='text-danger' {% endif %}>{{ card['Courses'][0][course]["Time to Platinum"] }}</td>
+                            {% if card['Courses'][0][course]["Time"][0] == '0' %}
+                                <td>Not Played</td>
+                                <td>Not Played</td>
+                            {% else %}
+                                <td {% if card['Courses'][0][course]["Time to Specialist"][0] == '-' %} class='text-success' {% else %} class='text-danger' {% endif %}>{{ card['Courses'][0][course]["Time to Specialist"] }}</td>
+                                <td {% if card['Courses'][0][course]["Time to Platinum"][0] == '-' %} class='text-success' {% else %} class='text-danger' {% endif %}>{{ card['Courses'][0][course]["Time to Platinum"] }}</td>
+                            {% endif %}
                             <td>{{ card['Courses'][0][course]["Car Make"] }}</td>
                             <td>{{ card['Courses'][0][course]["Car Model"] }}</td>
                             <td>{{ card['Courses'][0][course]["Lap 1"] }}</td>
