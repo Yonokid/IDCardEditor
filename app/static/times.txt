@@ -1,0 +1,32 @@
+Lake Akina (CCW),2'07"000,2'09"000
+Lake Akina (CW),2'07"000,2'09"000
+Myogi (DH),2'32"000,2'42"000
+Myogi (UH),2'38"000,2'48"000 
+Akagi (DH),2'33"000,2'45"000
+Akagi (UH),2'40"000,2'49"000
+Akina (DH),2'55"000,3'09"000
+Akina (UH),3'04"000,3'18"000
+Irohazaka (DH),2'52"000,3'09"000
+Irohazaka (UH),3'01"000,3'14"000
+Tsukuba (OB),2'45"000,2'58"000
+Tsukuba (IB),2'46"000,2'59"000
+Happogahara (OB),2'47"000,2'57"000
+Happogahara (IB),2'49"000,2'59"000
+Nagao (DH),2'50"000,3'04"000
+Nagao (UH),2'58"000,3'11"000
+Tsubaki Line (DH),2'57"000,3'09"000
+Tsubaki Line (UH),3'05"000,3'17"000
+Nanagamari (DH),2'33"000,2'44"000
+Nanagamari (UH),2'38"000,2'50"000
+Sadamine (DH),2'46"000,2'59"000
+Sadamine (UH),2'51"000,3'04"000
+Tsuchisaka (OB),2'32"000,2'42"000
+Tsuchisaka (IB),2'34"000,2'44"000
+Akina Snow (DH),3'12"000,3'24"000
+Akina Snow (UH),3'20"000,3'32"000
+Hakone (DH),2'58"000,3'00"000
+Hakone (UH),3'07"000,3'08"000
+Momiji Line (DH),2'32"000,2'43"000
+Momiji Line (UH),2'32"000,2'44"000
+Usui (CCW),2'41"000,2'48"000
+Usui (CW),2'41"000,2'48"000

@@ -66,12 +66,14 @@
                         <tr>
                             <th>Course Name</th>
                             <th>Time</th>
+                            <th>Time to Specialist</th>
+                            <th>Time to Platinum</th>
                             <th>Car Make</th>
                             <th>Car Model</th>
-                            <th>In-Store Wins</th>
                             <th>Lap 1</th>
                             <th>Lap 2</th>
                             <th>Lap 3</th>
+                            <th>Lap 4</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -79,12 +81,14 @@
                         <tr>
                             <td>{{ course }}</td>
                             <td>{{ card['Courses'][0][course]["Time"] }}</td>
+                            <td {% if card['Courses'][0][course]["Time to Specialist"][0] == '-' %} class='text-success' {% else %} class='text-danger' {% endif %}>{{ card['Courses'][0][course]["Time to Specialist"] }}</td>
+                            <td {% if card['Courses'][0][course]["Time to Platinum"][0] == '-' %} class='text-success' {% else %} class='text-danger' {% endif %}>{{ card['Courses'][0][course]["Time to Platinum"] }}</td>
                             <td>{{ card['Courses'][0][course]["Car Make"] }}</td>
                             <td>{{ card['Courses'][0][course]["Car Model"] }}</td>
-                            <td>{{ card['Courses'][0][course]["In-Store Wins"] }}</td>
                             <td>{{ card['Courses'][0][course]["Lap 1"] }}</td>
                             <td>{{ card['Courses'][0][course]["Lap 2"] }}</td>
                             <td>{{ card['Courses'][0][course]["Lap 3"] }}</td>
+                            <td>{{ card['Courses'][0][course]["Lap 4"] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

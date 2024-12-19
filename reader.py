@@ -81,6 +81,7 @@ def read_card(filename):
     aura_list = read_txt('app/static/aura.txt')
     class_list = read_txt('app/static/class.txt')
     title_list = read_txt('app/static/titles.txt')
+    course_times_list = read_txt('app/static/times.txt')
 
     header = f.read(80)
     data_dict["Game Version"] = [card_version_dict[pretty_bytes(f.read(2), byte_order='little')], True]
@@ -254,9 +255,18 @@ def read_card(filename):
     data_dict["CRC21"] = [pretty_bytes(f.read(2)), False]
     for i in range(len(courses)):
         course = courses[i]
-        course_dict[course]["Lap 1"] = ms_to_time(int.from_bytes(f.read(2), byteorder="little"))
-        course_dict[course]["Lap 2"] = ms_to_time(int.from_bytes(f.read(2), byteorder="little"))
-        course_dict[course]["Lap 3"] = ms_to_time(int.from_bytes(f.read(2), byteorder="little"))
+        lap_1 = int.from_bytes(f.read(2), byteorder="big")
+        lap_2 = int.from_bytes(f.read(2), byteorder="big")
+        lap_3 = int.from_bytes(f.read(2), byteorder="big")
+        total = time_to_ms(course_dict[course]["Time"])
+        lap_4 = total - (lap_1 + lap_2 + lap_3)
+        course_dict[course]["Lap 1"] = ms_to_time(lap_1)
+        course_dict[course]["Lap 2"] = ms_to_time(lap_2)
+        course_dict[course]["Lap 3"] = ms_to_time(lap_3)
+        course_dict[course]["Lap 4"] = ms_to_time(lap_4)
+        course_builtin_times = course_times_list[i].split(',')
+        course_dict[course]["Time to Specialist"] = f'{ms_to_time(total - time_to_ms(course_builtin_times[1]))}\n({course_builtin_times[1]})'
+        course_dict[course]["Time to Platinum"] = f'{ms_to_time(total - time_to_ms(course_builtin_times[2]))}\n({course_builtin_times[2]})'
     tuning_dict = dict()
     for i in range(25):
         tuning_dict[f"Car {i}"] = pretty_bytes(f.read(1))
