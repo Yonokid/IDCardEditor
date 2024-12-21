@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1 class='d-flex justify-content-center'>Initial D 8 Infinity Leaderboard</h1>
+    <div class='flex p-4'>
+    {% for course in leaderboard %}
+        <h1>{{ course }}</h1>
+        <div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Time</th>
+                        <th>Car Make</th>
+                        <th>Car Model</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(len(leaderboard[course])) %}
+                    <tr>
+                        <td>{{ leaderboard[course][i]["Username"] }}</td>
+                        <td>{{ leaderboard[course][i]["Time"] }}</td>
+                        <td>{{ leaderboard[course][i]["Car Make"] }}</td>
+                        <td>{{ leaderboard[course][i]["Car Model"] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        <div>
+    {% endfor %}
+    </div>
+{% endblock %}

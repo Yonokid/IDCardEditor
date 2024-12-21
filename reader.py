@@ -1,6 +1,7 @@
 import os
 import sys
 from bidict import bidict
+import sqlite3
 
 card_version_dict = bidict({"0xFFFF": "4", "0x5210": "5", "0x6013": "6 AA", "0x7012": "7 AAX", "0x8015": "8 Infinity"})
 model_dict = {"Toyota": ["TRUENO GT-APEX (AE86)", "LEVIN GT-APEX (AE86)", "LEVIN SR (AE85)", "86 GT (ZN6)", "MR2 G-Limited (SW20)", "MR-S (ZZW30)", "ALTEZZA RS200 (SXE10)", "SUPRA RZ (JZA80)", "PRIUS (ZVW30)", "SPRINTER TRUENO 2door GT-APEX (AE86)", "CELICA GT-FOUR (ST205)"],
@@ -86,7 +87,7 @@ def read_card(filename):
     header = f.read(80)
     data_dict["Game Version"] = [card_version_dict[pretty_bytes(f.read(2), byte_order='little')], True]
     data_dict["Issued Store"] = [pretty_bytes(f.read(2)), False]
-    data_dict["User ID"] = [int.from_bytes(f.read(4), byteorder="big", signed=True), False]
+    data_dict["User ID"] = [int.from_bytes(f.read(4), byteorder="little", signed=True), False]
     data_dict["Home Area"] = [prefectures[int.from_bytes(f.read(2), byteorder="little")], True]
     data_dict["Avatar Gender"] = [avatar_gender_list[int.from_bytes(f.read(2), byteorder="little")], True]
     data_dict["Previous Card ID"] = [int.from_bytes(f.read(4), byteorder="little"), False]
@@ -276,7 +277,7 @@ def read_card(filename):
     data_dict["CRC22"] = [pretty_bytes(f.read(2)), False]
     return data_dict
 
-def write_card(filename, data_dict):
+def write_card(filename, data_dict, user_id):
     f = filename
     prefectures = read_txt('app/static/prefectures.txt')
     avatar_gender_list = read_txt('app/static/avatar_gender.txt')
@@ -294,7 +295,8 @@ def write_card(filename, data_dict):
     f.seek(80)
     f.write(safe_bytes(card_version_dict.inverse.get(data_dict["Game Version"][0]), 2, byteorder='big'))
     f.write(safe_bytes(data_dict["Issued Store"][0], 2, byteorder='little'))
-    f.write(safe_bytes(data_dict["User ID"][0], 4, byteorder='big', signed=True))
+    data_dict["User ID"][0] = user_id
+    f.write(safe_bytes(data_dict["User ID"][0], 4, byteorder='little', signed=True))
     f.write(safe_bytes(prefectures.index(data_dict["Home Area"][0]), 2, byteorder='little'))
     f.write(safe_bytes(avatar_gender_list.index(data_dict["Avatar Gender"][0]), 2, byteorder='little'))
     f.write(safe_bytes(data_dict["Previous Card ID"][0], 4, byteorder='little'))
@@ -474,3 +476,36 @@ def write_card(filename, data_dict):
     f.write(safe_bytes(data_dict["Time Release Car Open Flag"][0], 1))
     padding = f.read(4)
     f.write(safe_bytes(data_dict["CRC22"][0], 2))
+
+def create_leaderboard_table():
+    conn = sqlite3.connect('leaderboard.db')
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS leaderboard (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
+        times TEXT NOT NULL
+    )
+    """)
+    conn.commit()
+    conn.close()
+
+def upload_times(user_id, username, times):
+    create_leaderboard_table()
+    conn = sqlite3.connect('leaderboard.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM leaderboard")
+    num_users = cursor.fetchone()[0]
+    times = str(times)
+    if user_id == -1:
+        user_id = num_users + 1
+        cursor.execute("INSERT INTO leaderboard (user_id, username, times) VALUES (?, ?, ?)",
+                       (user_id, username, times))
+    else:
+        cursor.execute("UPDATE leaderboard SET username = ?, times = ? WHERE user_id = ?",
+                       (username, times, user_id))
+    conn.commit()
+    conn.close()
+    return user_id

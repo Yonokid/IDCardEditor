@@ -3,10 +3,13 @@ from werkzeug.utils import secure_filename
 from app import app
 from reader import *
 import hashlib
+import sqlite3
+import ast
 from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
 app.config['SECRET_KEY'] = 'super cool secret key'
+app.jinja_env.globals.update(len=len)
 byte_data = dict()
 
 def allowed_file(filename):
@@ -68,7 +71,42 @@ def download(name):
         if form_value is not None:
             card[key][0] = form_value
     new_data = BytesIO(byte_data[name])
-    write_card(new_data, card)
+    user_id = card["User ID"][0]
+    times = card["Courses"][0]
+    username = card["Driver Name"][0]
+    new_user_id = upload_times(user_id, username, times)
+    write_card(new_data, card, new_user_id)
     new_data.seek(0)
     response = send_file(new_data, as_attachment=True, download_name='SBZZ_card.bin')
     return response
+
+@app.route('/leaderboard')
+def view_leaderboard():
+    conn = sqlite3.connect('leaderboard.db')
+    cursor = conn.cursor()
+    all_data = cursor.execute('SELECT username, times FROM leaderboard')
+    leaderboard = dict()
+    for username, times in all_data.fetchall():
+        times_dict = ast.literal_eval(times)
+        for course in times_dict:
+            if course not in leaderboard:
+                leaderboard[course] = []
+            current_time = time_to_ms(times_dict[course]['Time'])
+            if current_time == 0:
+                continue
+            if len(leaderboard[course]) < 10:
+                leaderboard[course].append({'Username': username, 'Time': current_time,
+                                            'Car Make': times_dict[course]['Car Make'],
+                                            'Car Model': times_dict[course]['Car Model']})
+            else:
+                leaderboard[course].sort(key=lambda x: x['Time'])
+                if current_time < leaderboard[course][-1]['Time']:
+                    leaderboard[course][-1] = {'Username': username, 'Time': current_time,
+                                                'Car Make': times_dict[course]['Car Make'],
+                                                'Car Model': times_dict[course]['Car Model']}
+            leaderboard[course] = leaderboard[course][:10]
+    for course in leaderboard:
+        for i in range(len(leaderboard[course])):
+            leaderboard[course][i]["Time"] = ms_to_time(leaderboard[course][i]["Time"])
+    conn.close()
+    return render_template('leaderboard.html', title='Leaderboard', leaderboard=leaderboard)
