@@ -1,7 +1,7 @@
 import os
 import sys
 from bidict import bidict
-import sqlite3
+import psycopg2
 
 card_version_dict = bidict({"0xFFFF": "4", "0x5210": "5", "0x6013": "6 AA", "0x7012": "7 AAX", "0x8015": "8 Infinity"})
 model_dict = {"Toyota": ["TRUENO GT-APEX (AE86)", "LEVIN GT-APEX (AE86)", "LEVIN SR (AE85)", "86 GT (ZN6)", "MR2 G-Limited (SW20)", "MR-S (ZZW30)", "ALTEZZA RS200 (SXE10)", "SUPRA RZ (JZA80)", "PRIUS (ZVW30)", "SPRINTER TRUENO 2door GT-APEX (AE86)", "CELICA GT-FOUR (ST205)"],
@@ -478,12 +478,12 @@ def write_card(filename, data_dict, user_id):
     f.write(safe_bytes(data_dict["CRC22"][0], 2))
 
 def create_leaderboard_table():
-    conn = sqlite3.connect('leaderboard.db')
+    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
     cursor = conn.cursor()
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS leaderboard (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         user_id INTEGER NOT NULL,
         username TEXT NOT NULL,
         times TEXT NOT NULL
@@ -494,18 +494,18 @@ def create_leaderboard_table():
 
 def upload_times(user_id, username, times):
     create_leaderboard_table()
-    conn = sqlite3.connect('leaderboard.db')
+    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM leaderboard")
     num_users = cursor.fetchone()[0]
     times = str(times)
     if user_id == -1:
         user_id = num_users + 1
-        cursor.execute("INSERT INTO leaderboard (user_id, username, times) VALUES (?, ?, ?)",
-                       (user_id, username, times))
+        cursor.execute("INSERT INTO leaderboard (user_id, username, times) VALUES (%s, %s, %s)",
+                               (user_id, username, times))
     else:
-        cursor.execute("UPDATE leaderboard SET username = ?, times = ? WHERE user_id = ?",
-                       (username, times, user_id))
+        cursor.execute("UPDATE leaderboard SET username = %s, times = %s WHERE user_id = %s",
+                               (username, times, user_id))
     conn.commit()
     conn.close()
     return user_id

@@ -3,15 +3,17 @@ from werkzeug.utils import secure_filename
 from app import app
 from reader import *
 import hashlib
-import sqlite3
 import ast
-import vercel_blob
+import psycopg2
+from dotenv import load_dotenv
 from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
 app.config['SECRET_KEY'] = 'super cool secret key'
 app.jinja_env.globals.update(len=len)
 byte_data = dict()
+
+load_dotenv()
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -75,15 +77,15 @@ def download(name):
     user_id = card["User ID"][0]
     times = card["Courses"][0]
     username = card["Driver Name"][0]
-    #new_user_id = upload_times(user_id, username, times)
-    write_card(new_data, card, -1)
+    new_user_id = upload_times(user_id, username, times)
+    write_card(new_data, card, new_user_id)
     new_data.seek(0)
     response = send_file(new_data, as_attachment=True, download_name='SBZZ_card.bin')
     return response
 
 @app.route('/leaderboard')
 def view_leaderboard():
-    conn = sqlite3.connect('leaderboard.db')
+    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
     cursor = conn.cursor()
     all_data = cursor.execute('SELECT username, times FROM leaderboard')
     leaderboard = dict()
