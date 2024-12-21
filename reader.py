@@ -12,7 +12,7 @@ model_dict = {"Toyota": ["TRUENO GT-APEX (AE86)", "LEVIN GT-APEX (AE86)", "LEVIN
               "Mitsubishi": ["LANCER Evolution III (CE9A)", "LANCER EVOLUTION IV (CN9A)", "LANCER Evolution VII (CT9A)", "LANCER Evolution IX (CT9A)", "LANCER EVOLUTION X (CZ4A)", "LANCER GSR EVOLUTION VI T.M.EDITION (CP9A)", "LANCER RS EVOLUTION V (CP9A)"],
               "Suzuki": ["Cappuccino (EA11R)"],
               "Initial D": ["SILEIGHTY", "TRUENO 2door GT-APEX (AE86)"],
-              "Complete": ["G-FORCE SUPRA (JZA80-kai)", "MONSTER CIVIC R (EK9)", "NSX-R GT (NA2)", "RE Amemiya Genki-7 (FD3S)", "S2000 GT1 (AP1)", "ROADSTER C-SPEC (NA8C Kai)"]
+              "Complete": ["G-FORCE SUPRA (JZA80-kai)", "MONSTER CIVIC R (EK9)", "S2000 GT1 (AP1)", "RE Amemiya Genki-7 (FD3S)", "NSX-R GT (NA2)", "ROADSTER C-SPEC (NA8C Kai)"]
               }
 data_dict = dict()
 
