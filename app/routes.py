@@ -87,9 +87,10 @@ def download(name):
 def view_leaderboard():
     conn = psycopg2.connect(os.getenv('DATABASE_URL'))
     cursor = conn.cursor()
-    all_data = cursor.execute('SELECT username, times FROM leaderboard')
+    cursor.execute('SELECT username, times FROM leaderboard')
     leaderboard = dict()
-    for username, times in all_data.fetchall():
+    all_data = cursor.fetchall()
+    for username, times in all_data:
         times_dict = ast.literal_eval(times)
         for course in times_dict:
             if course not in leaderboard:
