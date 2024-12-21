@@ -275,6 +275,7 @@ def read_card(filename):
     data_dict["Time Release Car Open Flag"] = [pretty_bytes(f.read(1)), False]
     padding = f.read(4)
     data_dict["CRC22"] = [pretty_bytes(f.read(2)), False]
+    data_dict["Upload Scores"] = [True, True]
     return data_dict
 
 def write_card(filename, data_dict, user_id):

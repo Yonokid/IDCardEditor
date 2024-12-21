@@ -77,7 +77,10 @@ def download(name):
     user_id = card["User ID"][0]
     times = card["Courses"][0]
     username = card["Driver Name"][0]
-    new_user_id = upload_times(user_id, username, times)
+    if card["Upload Scores"][0]:
+        new_user_id = upload_times(user_id, username, times)
+    else:
+        new_user_id = user_id
     write_card(new_data, card, new_user_id)
     new_data.seek(0)
     response = send_file(new_data, as_attachment=True, download_name='SBZZ_card.bin')
