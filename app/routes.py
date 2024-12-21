@@ -5,6 +5,7 @@ from reader import *
 import hashlib
 import sqlite3
 import ast
+import vercel_blob
 from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
@@ -74,8 +75,8 @@ def download(name):
     user_id = card["User ID"][0]
     times = card["Courses"][0]
     username = card["Driver Name"][0]
-    new_user_id = upload_times(user_id, username, times)
-    write_card(new_data, card, new_user_id)
+    #new_user_id = upload_times(user_id, username, times)
+    write_card(new_data, card, -1)
     new_data.seek(0)
     response = send_file(new_data, as_attachment=True, download_name='SBZZ_card.bin')
     return response
