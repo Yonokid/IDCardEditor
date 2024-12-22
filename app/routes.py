@@ -111,6 +111,7 @@ def view_leaderboard():
                     leaderboard[course][-1] = {'Username': username, 'Time': current_time,
                                                 'Car Make': times_dict[course]['Car Make'],
                                                 'Car Model': times_dict[course]['Car Model']}
+            leaderboard[course].sort(key=lambda x: x['Time'])
             leaderboard[course] = leaderboard[course][:10]
     for course in leaderboard:
         for i in range(len(leaderboard[course])):

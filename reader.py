@@ -2,6 +2,7 @@ import os
 import sys
 from bidict import bidict
 import psycopg2
+import random
 
 card_version_dict = bidict({"0xFFFF": "4", "0x5210": "5", "0x6013": "6 AA", "0x7012": "7 AAX", "0x8015": "8 Infinity"})
 model_dict = {"Toyota": ["TRUENO GT-APEX (AE86)", "LEVIN GT-APEX (AE86)", "LEVIN SR (AE85)", "86 GT (ZN6)", "MR2 G-Limited (SW20)", "MR-S (ZZW30)", "ALTEZZA RS200 (SXE10)", "SUPRA RZ (JZA80)", "PRIUS (ZVW30)", "SPRINTER TRUENO 2door GT-APEX (AE86)", "CELICA GT-FOUR (ST205)"],
@@ -497,11 +498,9 @@ def upload_times(user_id, username, times):
     create_leaderboard_table()
     conn = psycopg2.connect(os.getenv('DATABASE_URL'))
     cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM leaderboard")
-    num_users = cursor.fetchone()[0]
     times = str(times)
     if user_id == -1:
-        user_id = num_users + 1
+        user_id = random.randint(1, 2147483647)
         cursor.execute("INSERT INTO leaderboard (user_id, username, times) VALUES (%s, %s, %s)",
                                (user_id, username, times))
     else:
