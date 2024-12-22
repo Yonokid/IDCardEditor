@@ -16,7 +16,7 @@
                 </thead>
                 <tbody>
                     {% for i in range(len(leaderboard[course])) %}
-                    <tr>
+                    <tr {% if i == 0 %} class="table-warning" {% endif %}>
                         <td>{{ leaderboard[course][i]["Username"] }}</td>
                         <td>{{ leaderboard[course][i]["Time"] }}</td>
                         <td>{{ leaderboard[course][i]["Car Make"] }}</td>
