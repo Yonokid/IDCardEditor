@@ -70,6 +70,8 @@ def edit_file(name):
 
 @app.route('/download/<name>', methods=["GET", "POST"])
 def download(name):
+    if name not in byte_data:
+        raise Exception(byte_data)
     card = read_card(BytesIO(byte_data[name]))
     for key in card:
         form_value = request.form.get(f"key_{key}")
