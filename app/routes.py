@@ -1,4 +1,4 @@
-from flask import render_template, request, flash, redirect, url_for, send_file
+from flask import render_template, request, flash, redirect, url_for, send_file, session
 from werkzeug.utils import secure_filename
 from app import app
 from reader import *
@@ -13,7 +13,6 @@ app.config['SECRET_KEY'] = 'super cool secret key'
 app.jinja_env.globals.update(len=len)
 app.jinja_env.globals.update(str=str)
 app.jinja_env.globals.update(int=int)
-byte_data = dict()
 
 load_dotenv()
 
@@ -46,13 +45,14 @@ def upload_file():
             if file_content[:16] != header:
                 return redirect(request.url)
             hashed_filename = hashlib.sha256(file_content).hexdigest() + '.bin'
-            byte_data[hashed_filename] = file_content
+            session[hashed_filename] = file_content
             return redirect(url_for('edit_file', name=hashed_filename))
     return render_template('index.html')
 
 @app.route('/card/<name>')
 def edit_file(name):
-    card = read_card(BytesIO(byte_data[name]))
+    file_content = session[name]
+    card = read_card(BytesIO(file_content))
     static_data = []
     static_data.append(read_txt('app/static/prefectures.txt'))
     static_data.append(read_txt('app/static/avatar_gender.txt'))
@@ -70,14 +70,13 @@ def edit_file(name):
 
 @app.route('/download/<name>', methods=["GET", "POST"])
 def download(name):
-    if name not in byte_data:
-        raise Exception(byte_data)
-    card = read_card(BytesIO(byte_data[name]))
+    file_content = session[name]
+    card = read_card(BytesIO(file_content))
     for key in card:
         form_value = request.form.get(f"key_{key}")
         if form_value is not None:
             card[key][0] = form_value
-    new_data = BytesIO(byte_data[name])
+    new_data = BytesIO(session[name])
     user_id = card["User ID"][0]
     times = card["Courses"][0]
     username = card["Driver Name"][0]
