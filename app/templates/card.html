@@ -68,13 +68,13 @@
                     <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][2]) + '.png') }}">
                     <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][3]) + '.png') }}">
                     <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '.png') }}">
-                    {% if card['Avatar'][0][6] != 0 %}
+                    {% if int(card['Avatar'][0][6]) != 0 %}
                         <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '.png') }}">
                         <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][6]) + '_bg.png') }}">
                         <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][6]) + '_fg.png') }}">
                     {% else %}
-                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '_bg.png') }}">
-                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '_fg.png') }}">
+                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '_bg.png') }}">
+                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '_fg.png') }}">
                     {% endif %}
                 </div>
                 <h2 class="text-left">Course Times</h2>
