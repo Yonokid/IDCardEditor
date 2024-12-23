@@ -11,6 +11,7 @@ from io import BytesIO
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
 app.config['SECRET_KEY'] = 'super cool secret key'
 app.jinja_env.globals.update(len=len)
+app.jinja_env.globals.update(str=str)
 byte_data = dict()
 
 load_dotenv()

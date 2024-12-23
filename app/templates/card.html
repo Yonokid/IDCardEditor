@@ -60,6 +60,19 @@
             </div>
             <!-- Right Column (Other Data Section) -->
             <div class="col-md-6">
+                <h2 class="text-left">Avatar</h2>
+                <div style="width: 256px; height: 256px;">
+                    <img class="position-absolute" src="{{ url_for('static', filename='D8/BG/' + str(card['My Frame'][0]) + '_bg.png') }}">
+                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][0]) + '.png') }}">
+                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][1]) + '.png') }}">
+                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][2]) + '.png') }}">
+                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][3]) + '.png') }}">
+                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '.png') }}">
+                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '_fg.png') }}">
+                    {% if card['Avatar'][0][6] != 0 %}
+                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][6]) + '.png') }}">
+                    {% endif %}
+                </div>
                 <h2 class="text-left">Course Times</h2>
                 <table class="table table-bordered">
                     <thead>

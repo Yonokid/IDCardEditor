@@ -183,7 +183,7 @@ def read_card(filename):
     data_dict["Team Flag"] = [pretty_bytes(f.read(4)), False]
     data_dict["Driver Flags"] = [pretty_bytes(f.read(4)), False]
     data_dict["Driver Points"] = [int.from_bytes(f.read(4), byteorder="little"), True]
-    data_dict["Avatar"] = [get_avatar_from_card(f.read(12)), True]
+    data_dict["Avatar"] = [get_avatar_from_card(f.read(12)), False]
     padding = f.read(32)
     data_dict["Driver Name"] = [(f.read(14).rstrip(b'\x00')).decode('shift-jis'), True]
     data_dict["CRC01"] = [pretty_bytes(f.read(2)), False]
@@ -213,7 +213,7 @@ def read_card(filename):
     for i in range(3 - data_dict["Number of Cars"][0]):
         f.read(96)
     data_dict["Avatar Points"] = [int.from_bytes(f.read(1), byteorder="little"), False]
-    data_dict["My Frame"] = [int.from_bytes(f.read(1), byteorder="little"), True]
+    data_dict["My Frame"] = [int.from_bytes(f.read(1), byteorder="little"), False]
     data_dict["Selected Cup"] = [cup_list[int.from_bytes(f.read(1), byteorder="little")], True]
     data_dict["Tachometer"] = [tachometer_list[int.from_bytes(f.read(1), byteorder="little")], True]
     padding = f.read(1)
@@ -528,7 +528,6 @@ def write_card(filename, data_dict, user_id):
 def create_leaderboard_table():
     conn = psycopg2.connect(os.getenv('DATABASE_URL'))
     cursor = conn.cursor()
-
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS leaderboard (
         id SERIAL PRIMARY KEY,
