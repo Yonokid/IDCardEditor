@@ -69,6 +69,52 @@ def time_to_ms(time_str):
     total_ms = (minutes * 60000) + (seconds * 1000) + milliseconds
     return total_ms
 
+def get_avatar_from_card(avatar_list_bytes):
+    part_list = [0] * 7
+    part_list[0] = (avatar_list_bytes[1] & 0xF) << 8 | avatar_list_bytes[0]
+    part_list[1] = (avatar_list_bytes[1] >> 4) | (16 * avatar_list_bytes[2])
+    part_list[2] = (avatar_list_bytes[4] & 0xF) << 8 | avatar_list_bytes[3]
+    part_list[3] = (avatar_list_bytes[4] >> 4) | (16 * avatar_list_bytes[5])
+    part_list[4] = (avatar_list_bytes[7] & 0xF) << 8 | avatar_list_bytes[6]
+    part_list[5] = (avatar_list_bytes[7] >> 4) | (16 * avatar_list_bytes[8])
+    part_list[6] = (avatar_list_bytes[10] & 0xF) << 8 | avatar_list_bytes[9]
+    print(f"Avatar parts: {part_list[0]},{part_list[1]},{part_list[2]},{part_list[3]},{part_list[4]},{part_list[5]},{part_list[6]}")
+    return part_list
+
+def convert_part_list_to_bytes(part_list):
+    byte_list = [0] * 11
+    part1 = safe_bytes(part_list[0], 2)
+    byte_list[0] = part1[0]
+    byte_list[1] = part1[1]
+    byte_list[1] = (byte_list[1] & 0xF) | (byte_list[1] & 0xF0)
+    part2_helper = (byte_list[1] & 0xF) | (16 * part_list[1])
+    part2_bytes = safe_bytes(part2_helper, 2)
+    byte_list[1] = part2_bytes[0]
+    byte_list[2] = part2_bytes[1]
+    part3 = safe_bytes(part_list[2], 2)
+    byte_list[3] = part3[0]
+    byte_list[4] = part3[1]
+    byte_list[4] = (byte_list[4] & 0xF) | (byte_list[4] & 0xF0)
+    part4_helper = (byte_list[4] & 0xF) | (16 * part_list[3])
+    part4_bytes = safe_bytes(part4_helper, 2)
+    byte_list[4] = part4_bytes[0]
+    byte_list[5] = part4_bytes[1]
+    part5 = safe_bytes(part_list[4], 2)
+    byte_list[6] = part5[0]
+    byte_list[7] = part5[1]
+    byte_list[7] = (byte_list[7] & 0xF) | (byte_list[7] & 0xF0)
+    part6_helper = (byte_list[7] & 0xF) | (16 * part_list[5])
+    part6_bytes = safe_bytes(part6_helper, 2)
+    byte_list[7] = part6_bytes[0]
+    byte_list[8] = part6_bytes[1]
+    part7 = safe_bytes(part_list[6], 2)
+    byte_list[9] = part7[0]
+    byte_list[10] = part7[1]
+    byte_list[10] = (byte_list[10] & 0xF) | (byte_list[10] & 0xF0)
+    print(f"Avatar parts: {''.join(f'{byte:02X}' for byte in byte_list)}")
+    return safe_bytes('0x' + ''.join(f'{byte:02X}' for byte in byte_list), 12)
+
+
 def read_card(filename):
     f = filename
     prefectures = read_txt('app/static/prefectures.txt')
@@ -137,7 +183,7 @@ def read_card(filename):
     data_dict["Team Flag"] = [pretty_bytes(f.read(4)), False]
     data_dict["Driver Flags"] = [pretty_bytes(f.read(4)), False]
     data_dict["Driver Points"] = [int.from_bytes(f.read(4), byteorder="little"), True]
-    data_dict["Avatar"] = [pretty_bytes(f.read(12)), True]
+    data_dict["Avatar"] = [get_avatar_from_card(f.read(12)), True]
     padding = f.read(32)
     data_dict["Driver Name"] = [(f.read(14).rstrip(b'\x00')).decode('shift-jis'), True]
     data_dict["CRC01"] = [pretty_bytes(f.read(2)), False]
@@ -354,7 +400,7 @@ def write_card(filename, data_dict, user_id):
     f.write(safe_bytes(data_dict["Team Flag"][0], 4))
     f.write(safe_bytes(data_dict["Driver Flags"][0], 4))
     f.write(safe_bytes(int(data_dict["Driver Points"][0]), 4))
-    f.write(safe_bytes(data_dict["Avatar"][0], 12))
+    f.write(convert_part_list_to_bytes(data_dict["Avatar"][0]))
     f.write(b'\x00' * 32)
     encoded_name = data_dict["Driver Name"][0].encode('shift-jis')
     padded_name = encoded_name.ljust(14, b'\x00')
@@ -469,9 +515,9 @@ def write_card(filename, data_dict, user_id):
     f.write(safe_bytes(data_dict["CRC21"][0], 2))
     for i in range(len(courses)):
         course = courses[i]
-        f.write(safe_bytes(time_to_ms(course_dict[course]["Lap 1"]), 2))
-        f.write(safe_bytes(time_to_ms(course_dict[course]["Lap 2"]), 2))
-        f.write(safe_bytes(time_to_ms(course_dict[course]["Lap 3"]), 2))
+        f.write(safe_bytes(time_to_ms(course_dict[course]["Lap 1"]), 2, byteorder="big"))
+        f.write(safe_bytes(time_to_ms(course_dict[course]["Lap 2"]), 2, byteorder="big"))
+        f.write(safe_bytes(time_to_ms(course_dict[course]["Lap 3"]), 2, byteorder="big"))
     tuning_dict = data_dict["Car Tunings"][0]
     for i in range(25):
         f.write(safe_bytes(tuning_dict[f"Car {i}"], 1))
