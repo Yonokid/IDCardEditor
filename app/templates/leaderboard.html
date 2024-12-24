@@ -8,6 +8,7 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>Username</th>
                         <th>Time</th>
                         <th>Car Make</th>
@@ -17,6 +18,7 @@
                 <tbody>
                     {% for i in range(len(leaderboard[course])) %}
                     <tr {% if i == 0 %} class="table-warning" {% endif %}>
+                        <td>{{ i+1 }}</td>
                         <td>{{ leaderboard[course][i]["Username"] }}</td>
                         <td>{{ leaderboard[course][i]["Time"] }}</td>
                         <td>{{ leaderboard[course][i]["Car Make"] }}</td>
