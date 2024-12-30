@@ -85,6 +85,23 @@ def time_to_ms(time_str):
     total_ms = (minutes * 60000) + (seconds * 1000) + milliseconds
     return total_ms
 
+#def skip(distance):
+    #return .seek(distance, .tell)
+def bytes_to_2bit_strings(byte_data):
+    # List to hold the 2-bit strings
+    result = []
+
+    # Process each byte
+    for byte in byte_data:
+        # Convert the byte to its binary representation (padded to 8 bits)
+        binary_str = format(byte, '08b')
+
+        # Split the binary string into chunks of 2 bits
+        for i in range(0, 8, 2):
+            result.append(binary_str[i:i+2])
+
+    return result
+
 def get_avatar_from_card(avatar_list_bytes):
     part_list = [0] * 7
     part_list[0] = (avatar_list_bytes[1] & 0xF) << 8 | avatar_list_bytes[0]
@@ -242,16 +259,19 @@ def read_card(f):
     data_dict["Infinity Result Data 2"] = pretty_bytes(f.read(1))
     data_dict["Infinity Rank"] = int.from_bytes(f.read(2), byteorder="little")
     story_progress = f.read(23)
-    story_progress_list = []
+    story_progress_list = bytes_to_2bit_strings(story_progress)
+    print(story_progress_list)
     story_progress_dict = dict()
     for byte in story_progress:
         binary_byte = str(bin(byte))[2:]
         episodes = [binary_byte[i:i+2] for i in range(0, len(binary_byte), 2)]
         story_progress_list.extend(episodes)
-    for i in range(len(story_progress_list)-3):
-        if story_progress_list[i] == '0':
+    print(len(story_progress_list))
+    for i in range(len(story_list)):
+        print(story_progress_list[i])
+        if story_progress_list[i] in ('0', '00'):
             story_progress_dict[story_list[i]] = 'Not Played'
-        elif story_progress_list[i] == '01':
+        elif story_progress_list[i] in ('01', '1'):
             story_progress_dict[story_list[i]] = 'A'
         elif story_progress_list[i] == '10':
             story_progress_dict[story_list[i]] = 'S'
