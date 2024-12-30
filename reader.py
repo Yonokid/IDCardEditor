@@ -250,7 +250,7 @@ def read_card(filename):
         episodes = [binary_byte[i:i+2] for i in range(0, len(binary_byte), 2)]
         story_progress_list.extend(episodes)
     for i in range(len(story_progress_list)-3):
-        if story_progress_list[i] == '00':
+        if story_progress_list[i] == '0':
             story_progress_dict[story_list[i]] = 'Not Played'
         elif story_progress_list[i] == '01':
             story_progress_dict[story_list[i]] = 'A'
