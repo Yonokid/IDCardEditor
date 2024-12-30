@@ -2,7 +2,7 @@
 {% block content %}
 <form method="POST" action="{{ url_for('download', name=name) }}">
     <div class="mx-auto p-4">
-        <h1 class="text-left">Initial D {{ card['Game Version'][0] }} Card Editor</h1>
+        <h1 class="text-left">Initial D {{ card['Game Version'] }} Card Editor</h1>
         <nav>
           <div class="nav nav-tabs" id="nav-tab" role="tablist">
             <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="true">Profile</button>
@@ -16,50 +16,116 @@
                 <div class="row d-flex">
                     <!-- Left Column (Form Section) -->
                     <div class="col-md-6">
-                        {% set options_map = {
-                            'Home Area': data[0],'Avatar Gender': data[1],
-                            'BGM Volume': data[2],'Selected Cup': data[7],
-                            'Tachometer': data[8],'Aura': data[9],
-                            'Class': data[10],'Title': data[11]} %}
-                        {% set disabled_map = ['Game Version','Avatar','Car 1','Car 2','Car 3',
-                                                'Courses','Store Name','Number of Cars','Play Count','Story Losses',
-                                                'Story Wins','Total In-Store Plays','Total In-Store Wins','Course Proficiency'] %}
-                        {% set boolean_map = ['Force Quit','Cornering Guide',
-                                            'Guide Line','Cup','Barricade',
-                                            'Ghost Car', 'Upload Scores'] %}
-                        {% for key in card %}
-                            {% if card[key][1] %}
-                                <div class="form-group">
-                                    <label for="key_{{ key }}" class="form-label">{{ key }}:</label>
-                                    {% if key == 'Wheel Sensitivity' %}
-                                        <div class="form-group">
-                                            <div class="btn-group" role="group" aria-label="Wheel Sensitivity">
-                                                {% for i in range(1, 11) %}
-                                                    <button type="button" class="btn btn-outline-primary sensitivity-btn {% if card[key][0] == i %}active{% endif %}" data-value="{{ i }}">{{ i }}</button>
-                                                {% endfor %}
-                                            </div>
-                                            <input type="hidden" id="key_{{ key }}" name="key_{{ key }}" value="{{ card[key][0] }}" />
-                                        </div>
-                                    {% elif key in options_map %}
-                                        <select id="key_{{ key }}" name="key_{{ key }}" class="form-control">
-                                            {% for option in options_map[key] %}
-                                                <option value="{{ option }}" {% if card[key][0] == option %} selected {% endif %}>{{ option }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    {% elif key in disabled_map %}
-                                        <input type="text" id="key_{{ key }}" name="key_{{ key }}" value="{{ card[key][0] }}" class="form-control" disabled />
-                                    {% elif key in boolean_map %}
-                                        <div class="form-check">
-                                            <input type="checkbox" id="key_{{ key }}" name="key_{{ key }}" value="1" {% if card[key][0] == 1 %}checked{% endif %} class="form-check-input" data-toggle="toggle" />
-                                            <input type="hidden" name="key_{{ key }}" value="0" />
-                                            <label for="key_{{ key }}" class="form-check-label"></label>
-                                        </div>
-                                    {% else %}
-                                        <input type="text" id="key_{{ key }}" name="key_{{ key }}" value="{{ card[key][0] }}" class="form-control" />
-                                    {% endif %}
+                        <div class="form-group">
+                            {% set options_map = {
+                                'Home Area': data[0],'Avatar Gender': data[1],
+                                'BGM Volume': data[2],'Selected Cup': data[7],
+                                'Tachometer': data[8],'Aura': data[9],
+                                'Class': data[10],'Title': data[11]} %}
+                            <label for="key_Home Area" class="form-label">Home Area:</label>
+                            <select id="key_Home Area" name="key_Home Area" class="form-control">
+                                {% for option in options_map['Home Area'] %}
+                                    <option value="{{ option }}" {% if card['Home Area'] == option %} selected {% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="key_Wheel Sensitivity" class="form-label">Wheel Sensitivity:</label>
+                            <div class="form-group">
+                                <div class="btn-group" role="group" aria-label="Wheel Sensitivity">
+                                    {% for i in range(1, 11) %}
+                                        <button type="button" class="btn btn-outline-primary sensitivity-btn {% if card['Wheel Sensitivity'] == i %}active{% endif %}" data-value="{{ i }}">{{ i }}</button>
+                                    {% endfor %}
                                 </div>
-                            {% endif %}
-                        {% endfor %}
+                                <input type="hidden" id="key_Wheel Sensitivity" name="key_Wheel Sensitivity" value="{{ card['Wheel Sensitivity'] }}" />
+                            </div>
+                            <label for="key_BGM Volume" class="form-label">Home Area:</label>
+                            <select id="key_BGM Volume" name="key_BGM Volume" class="form-control">
+                                {% for option in options_map['BGM Volume'] %}
+                                    <option value="{{ option }}" {% if card['BGM Volume'] == option %} selected {% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="key_Force Quit" class="form-label">Force Quit:</label>
+                            <div class="form-check">
+                                <input type="checkbox" id="key_Force Quit" name="key_Force Quit" value="1" {% if card['Force Quit'] == 1 %} checked {% endif %} class="form-check-input" data-toggle="toggle" />
+                                <input type="hidden" name="key_Force Quit" value="0" />
+                                <label for="key_Force Quit" class="form-check-label"></label>
+                            </div>
+                            <label for="key_Cornering Guide" class="form-label">Cornering Guide:</label>
+                            <div class="form-check">
+                                <input type="checkbox" id="key_Cornering Guide" name="key_Cornering Guide" value="1" {% if card['Cornering Guide'] == 1 %} checked {% endif %} class="form-check-input" data-toggle="toggle" />
+                                <input type="hidden" name="key_Cornering Guide" value="0" />
+                                <label for="key_Cornering Guide" class="form-check-label"></label>
+                            </div>
+                            <label for="key_Guide Line" class="form-label">Guide Line:</label>
+                            <div class="form-check">
+                                <input type="checkbox" id="key_Guide Line" name="key_Guide Line" value="1" {% if card['Guide Line'] == 1 %} checked {% endif %} class="form-check-input" data-toggle="toggle" />
+                                <input type="hidden" name="key_Guide Line" value="0" />
+                                <label for="key_Guide Line" class="form-check-label"></label>
+                            </div>
+                            <label for="key_Cup" class="form-label">Cup:</label>
+                            <div class="form-check">
+                                <input type="checkbox" id="key_Cup" name="key_Cup" value="1" {% if card['Cup'] == 1 %} checked {% endif %} class="form-check-input" data-toggle="toggle" />
+                                <input type="hidden" name="key_Cup" value="0" />
+                                <label for="key_Cup" class="form-check-label"></label>
+                            </div>
+                            <label for="key_Barricade" class="form-label">Barricade:</label>
+                            <div class="form-check">
+                                <input type="checkbox" id="key_Barricade" name="key_Barricade" value="1" {% if card['Barricade'] == 1 %} checked {% endif %} class="form-check-input" data-toggle="toggle" />
+                                <input type="hidden" name="key_Barricade" value="0" />
+                                <label for="key_Barricade" class="form-check-label"></label>
+                            </div>
+                            <label for="key_Ghost Car" class="form-label">Ghost Car:</label>
+                            <div class="form-check">
+                                <input type="checkbox" id="key_Ghost Car" name="key_Ghost Car" value="1" {% if card['Ghost Car'] == 1 %} checked {% endif %} class="form-check-input" data-toggle="toggle" />
+                                <input type="hidden" name="key_Ghost Car" value="0" />
+                                <label for="key_Ghost Car" class="form-check-label"></label>
+                            </div>
+                            <label for="key_Class" class="form-label">Class:</label>
+                            <select id="key_Class" name="key_Class" class="form-control">
+                                {% for option in options_map['Class'] %}
+                                    <option value="{{ option }}" {% if card['Class'] == option %} selected {% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="key_Driver Points" class="form-label">Driver Points:</label>
+                            <input type="text" id="key_Driver Points" name="key_Driver Points" value="{{ card['Driver Points'] }}" class="form-control" />
+                            <label for="key_Driver Name" class="form-label">Driver Name:</label>
+                            <input type="text" id="key_Driver Name" name="key_Driver Name" value="{{ card['Driver Name'] }}" class="form-control" />
+                            <label for="key_Selected Cup" class="form-label">Selected Cup:</label>
+                            <select id="key_Selected Cup" name="key_Selected Cup" class="form-control">
+                                {% for option in options_map['Selected Cup'] %}
+                                    <option value="{{ option }}" {% if card['Selected Cup'] == option %} selected {% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="key_Tachometer" class="form-label">Tachometer:</label>
+                            <select id="key_Tachometer" name="key_Tachometer" class="form-control">
+                                {% for option in options_map['Tachometer'] %}
+                                    <option value="{{ option }}" {% if card['Tachometer'] == option %} selected {% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="key_Battle Stance" class="form-label">Battle Stance:</label>
+                            <input type="text" id="key_Battle Stance" name="key_Battle Stance" value="{{ card['Battle Stance'] }}" class="form-control" />
+                            <label for="key_Mileage" class="form-label">Mileage:</label>
+                            <input type="text" id="key_Mileage" name="key_Mileage" value="{{ card['Mileage'] }}" class="form-control" />
+                            <label for="key_Aura" class="form-label">Aura:</label>
+                            <select id="key_Aura" name="key_Aura" class="form-control">
+                                {% for option in options_map['Aura'] %}
+                                    <option value="{{ option }}" {% if card['Aura'] == option %} selected {% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="key_Title Effect" class="form-label">Title Effect:</label>
+                            <input type="text" id="key_Title Effect" name="key_Title Effect" value="{{ card['Title Effect'] }}" class="form-control" />
+                            <label for="key_Aura" class="form-label">Title:</label>
+                            <select id="key_Title" name="key_Title" class="form-control">
+                                {% for option in options_map['Title'] %}
+                                    <option value="{{ option }}" {% if card['Title'] == option %} selected {% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="key_Upload Scores" class="form-label">Upload Scores:</label>
+                            <div class="form-check">
+                                <input type="checkbox" id="key_Upload Scores" name="key_Upload Scores" value="1" {% if card['Upload Scores'] == 1 %} checked {% endif %} class="form-check-input" data-toggle="toggle" />
+                                <input type="hidden" name="key_Upload Scores" value="0" />
+                                <label for="key_Upload Scores" class="form-check-label"></label>
+                            </div>
+                        </div>
                     </div>
                     <!-- Right Column (Other Data Section) -->
                     <div class="col-md-6">
@@ -67,23 +133,23 @@
                         <div class="row">
                             <div class="col-md-auto">
                                 <div style="width: 256px; height: 256px;">
-                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/BG/' + str(card['My Frame'][0]) + '_bg.png') }}">
-                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][0]) + '.png') }}">
-                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][1]) + '.png') }}">
-                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][2]) + '.png') }}">
-                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][3]) + '.png') }}">
-                                    {% if int(card['Avatar'][0][6]) != 0 %}
-                                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '.png') }}">
-                                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][6]) + '_bg.png') }}">
-                                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][6]) + '_fg.png') }}">
+                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/BG/' + str(card['My Frame']) + '_bg.png') }}">
+                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][0]) + '.png') }}">
+                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][1]) + '.png') }}">
+                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][2]) + '.png') }}">
+                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][3]) + '.png') }}">
+                                    {% if int(card['Avatar'][6]) != 0 %}
+                                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][5]) + '.png') }}">
+                                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][6]) + '_bg.png') }}">
+                                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][6]) + '_fg.png') }}">
                                     {% else %}
-                                        {% if int(card['Avatar'][0][5]) != 0 %}
-                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '.png') }}">
-                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '_bg.png') }}">
-                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '_fg.png') }}">
+                                        {% if int(card['Avatar'][5]) != 0 %}
+                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][4]) + '.png') }}">
+                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][5]) + '_bg.png') }}">
+                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][5]) + '_fg.png') }}">
                                         {% else %}
-                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '_bg.png') }}">
-                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '_fg.png') }}">
+                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][4]) + '_bg.png') }}">
+                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'] + '/' + str(card['Avatar'][4]) + '_fg.png') }}">
                                         {% endif %}
                                     {% endif %}
                                 </div>
@@ -92,9 +158,17 @@
                                 <label for="key_{{ 'Avatar Gender' }}" class="form-label">{{ 'Avatar Gender' }}:</label>
                                 <select id="key_{{ 'Avatar Gender' }}" name="key_{{ 'Avatar Gender' }}" class="form-control">
                                     {% for option in options_map['Avatar Gender'] %}
-                                        <option value="{{ option }}" {% if card['Avatar Gender'][0] == option %} selected {% endif %}>{{ option }}</option>
+                                        <option value="{{ option }}" {% if card['Avatar Gender'] == option %} selected {% endif %}>{{ option }}</option>
                                     {% endfor %}
                                 </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <p>Store Name: {{ card['Store Name'] }}</p>
+                                <p>Play Count: {{ card['Play Count'] }}</p>
+                                <p>Total In-Store Plays: {{ card['Total In-Store Plays'] }}</p>
+                                <p>Total In-Store Plays: {{ card['Total In-Store Wins'] }}</p>
                             </div>
                         </div>
                     </div>
@@ -102,7 +176,7 @@
             </div>
             <div class="tab-pane fade" id="nav-courseinfo" role="tabpanel" aria-labelledby="nav-courseinfo-tab">
                 <h2 class="text-left">Course Times</h2>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>Course Name</th>
@@ -118,51 +192,50 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for course in card["Courses"][0] %}
+                        {% for course in card["Courses"] %}
                         <tr>
                             <td>{{ course }}</td>
-                            <td>{{ card['Courses'][0][course]["Time"] }}</td>
-                            {% if card['Courses'][0][course]["Time"][0] == '0' %}
+                            <td>{{ card['Courses'][course]["Time"] }}</td>
+                            {% if card['Courses'][course]["Time"][0] == '0' %}
                                 <td>Not Played</td>
                                 <td>Not Played</td>
                             {% else %}
-                                <td {% if card['Courses'][0][course]["Time to Specialist"][0] == '-' %} class='text-success' {% else %} class='text-danger' {% endif %}>{{ card['Courses'][0][course]["Time to Specialist"] }}</td>
-                                <td {% if card['Courses'][0][course]["Time to Platinum"][0] == '-' %} class='text-success' {% else %} class='text-danger' {% endif %}>{{ card['Courses'][0][course]["Time to Platinum"] }}</td>
+                                <td {% if card['Courses'][course]["Time to Specialist"][0] == '-' %} class='text-success' {% else %} class='text-danger' {% endif %}>{{ card['Courses'][course]["Time to Specialist"] }}</td>
+                                <td {% if card['Courses'][course]["Time to Platinum"][0] == '-' %} class='text-success' {% else %} class='text-danger' {% endif %}>{{ card['Courses'][course]["Time to Platinum"] }}</td>
                             {% endif %}
-                            <td>{{ card['Courses'][0][course]["Car Make"] }}</td>
-                            <td>{{ card['Courses'][0][course]["Car Model"] }}</td>
-                            <td>{{ card['Courses'][0][course]["Lap 1"] }}</td>
-                            <td>{{ card['Courses'][0][course]["Lap 2"] }}</td>
-                            <td>{{ card['Courses'][0][course]["Lap 3"] }}</td>
-                            <td>{{ card['Courses'][0][course]["Lap 4"] }}</td>
+                            <td>{{ card['Courses'][course]["Car Make"] }}</td>
+                            <td>{{ card['Courses'][course]["Car Model"] }}</td>
+                            <td>{{ card['Courses'][course]["Lap 1"] }}</td>
+                            <td>{{ card['Courses'][course]["Lap 2"] }}</td>
+                            <td>{{ card['Courses'][course]["Lap 3"] }}</td>
+                            <td>{{ card['Courses'][course]["Lap 4"] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                <p class="text-left">Course Proficiency: {{ card['Course Proficiency'][0]}}</p>
+                <p class="text-left">Course Proficiency: {{ card['Course Proficiency']}}</p>
             </div>
             <div class="tab-pane fade" id="nav-storyprogress" role="tabpanel" aria-labelledby="nav-storyprogress-tab">
-                <h2 class="text-left">Story Wins: {{ card['Story Wins'][0] }}</h2>
-                <h2 class="text-left">Story Losses: {{ card['Story Losses'][0] }}</h2>
-                <h2 class="text-left">Infinity Rank: {{ card['Infinity Rank'][0] }}</h2>
-                <p class="text-left">{{ card['Story Progress'][0] }}</p>
+                <h2 class="text-left">Story Wins: {{ card['Story Wins'] }}</h2>
+                <h2 class="text-left">Story Losses: {{ card['Story Losses'] }}</h2>
+                <h2 class="text-left">Infinity Rank: {{ card['Infinity Rank'] }}</h2>
+                <p class="text-left">{{ card['Story Progress'] }}</p>
             </div>
             <div class="tab-pane fade" id="nav-cars" role="tabpanel" aria-labelledby="nav-cars-tab">
-                <h2 class="text-left">Number of Cars: {{ card["Number of Cars"][0] }}</h2>
+                <h2 class="text-left">Number of Cars: {{ card["Number of Cars"] }}</h2>
                 <label for="key_{{ 'Current Car' }}" class="form-label">{{ 'Current Car' }}:</label>
                 <div class="form-group p-2">
                     <select id="key_{{ key }}" name="key_{{ key }}" class="form-control">
-                        {% for i in range(1, card['Number of Cars'][0]+1) %}
-                            <option value="{{ i }}" {% if card['Current Car'][0] == i %} selected {% endif %}>{{ i }}</option>
+                        {% for i in range(1, card['Number of Cars']+1) %}
+                            <option value="{{ i }}" {% if card['Current Car'] == i %} selected {% endif %}>{{ i }}</option>
                         {% endfor %}
                     </select>
-                    <input type="hidden" id="key_{{ 'Current Car' }}" name="key_{{ 'Current Car' }}" value="{{ card['Current Car'][0] }}" />
+                    <input type="hidden" id="key_{{ 'Current Car' }}" name="key_{{ 'Current Car' }}" value="{{ card['Current Car'] }}" />
                 </div>
-                {% for i in range(card["Number of Cars"][0]) %}
+                {% for i in range(card["Number of Cars"]) %}
                     <p class="text-left">Car {{ i+1 }}: {{ card['Car ' + (i+1)|string] }}</p>
                 {% endfor %}
             </div>
-            <!-- Submit Button -->
             <div class="text-left mt-4">
                 <button type="submit" class="btn btn-primary">Apply Changes</button>
             </div>

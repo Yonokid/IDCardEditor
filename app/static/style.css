@@ -1,11 +1,38 @@
-.parent {
+html,
+body {
+    height: 100%;
+    margin: 0;
     display: flex;
-    justify-content: center; /* Horizontal center */
-    align-items: center; /* Vertical center */
-    height: 100vh; /* Full height */
+    flex-direction: column;
 }
-
-.upload_button {
-    width: 300px;
-    height: 200px;
+.content {
+    flex-grow: 1;
+}
+footer {
+    text-align: center;
+    padding: 20px;
+}
+#darkModeSwitchContainer {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+}
+[data-bs-theme="dark"] .body-bg {
+    background-color: #0a121a;
+}
+[data-bs-theme="dark"] .footer-bg {
+    background-color: #080f14;
+}
+[data-bs-theme="dark"] .container-bg {
+    background-color: #1a2b36;
+}
+[data-bs-theme="light"] .body-bg {
+    background-color: #e1f1f7;
+}
+[data-bs-theme="light"] .footer-bg {
+    background-color: #f7f9fc;
+}
+[data-bs-theme="light"] .container-bg {
+    background-color: #d1e1ec;
 }

@@ -41,8 +41,8 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_content = file.read()
-            header = b'\x03\x36\x00\x01\x81\x41\x54\x06\xF7\x04\x16\x09\x03\x89\x03\x87'
-            if file_content[:16] != header:
+            header = b'\x03\x36\x00\x01'
+            if file_content[:4] != header:
                 return redirect(request.url)
             hashed_filename = hashlib.sha256(file_content).hexdigest() + '.bin'
             session[hashed_filename] = file_content
@@ -75,12 +75,12 @@ def download(name):
     for key in card:
         form_value = request.form.get(f"key_{key}")
         if form_value is not None:
-            card[key][0] = form_value
+            card[key] = form_value
     new_data = BytesIO(session[name])
-    user_id = card["User ID"][0]
-    times = card["Courses"][0]
-    username = card["Driver Name"][0]
-    if card["Upload Scores"][0]:
+    user_id = card["User ID"]
+    times = card["Courses"]
+    username = card["Driver Name"]
+    if card["Upload Scores"]:
         new_user_id = upload_times(user_id, username, times)
     else:
         new_user_id = user_id

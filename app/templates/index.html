@@ -1,8 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
-    <form method="post" enctype="multipart/form-data" class="p-4 bg-light rounded shadow-lg" style="background-color: #003366;">
-        <input type="file" name="file" class="form-control mb-3">
+    <form method="post" enctype="multipart/form-data" class="p-4 rounded shadow-lg container-bg">
+        <div class="p-1">
+            <h1>Initial D Card Editor</h1>
+            <p>View all of the data stored on your card!</p>
+            <h3>Versions Supported:</h3>
+            <ul>
+                <li>Initial Arcade Stage 8 Infinity (SBZZ)</li>
+            </ul>
+        </div>
+        <input type="file" name="file" class="form-control mb-3" accept=".bin, .crd">
         <input type="submit" value="Upload" class="btn btn-primary">
     </form>
 </div>

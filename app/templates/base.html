@@ -1,30 +1,95 @@
 <!doctype html>
-<html>
+<html lang="en" data-bs-theme="dark">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         {% if title %}
         <title>{{ title }} - Initial D Card Editor</title>
         {% else %}
         <title>Welcome to Initial D Card Editor</title>
         {% endif %}
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+            crossorigin="anonymous">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap5-toggle@5.1.1/css/bootstrap5-toggle.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bs-darkmode@2.0.0/css/bs-darkmode.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/theme-toggles@4.10.1/css/classic.min.css">
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     <body>
-        <div class="text-white" style="background-color: #0a121a;"y">
+        <div class="body-bg">
         {% block content %}
         {% endblock %}
         </div>
+        <div id="darkModeSwitchContainer">
+            <div class="theme-toggle form-check form-switc" title="Toggle theme">
+                <label class="theme-toggle" title="Toggle theme">
+                  <input type="checkbox" id="darkModeSwitch" />
+                  <span class="theme-toggle-sr">Toggle theme</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    width="1em"
+                    height="1em"
+                    fill="currentColor"
+                    stroke-linecap="round"
+                    class="theme-toggle__classic"
+                    viewBox="0 0 32 32"
+                  >
+                    <clipPath id="theme-toggle__classic__cutout">
+                      <path d="M0-5h30a1 1 0 0 0 9 13v24H0Z" />
+                    </clipPath>
+                    <g clip-path="url(#theme-toggle__classic__cutout)">
+                      <circle cx="16" cy="16" r="9.34" />
+                      <g stroke="currentColor" stroke-width="1.5">
+                        <path d="M16 5.5v-4" />
+                        <path d="M16 30.5v-4" />
+                        <path d="M1.5 16h4" />
+                        <path d="M26.5 16h4" />
+                        <path d="m23.4 8.6 2.8-2.8" />
+                        <path d="m5.7 26.3 2.9-2.9" />
+                        <path d="m5.8 5.8 2.8 2.8" />
+                        <path d="m23.4 23.4 2.9 2.9" />
+                      </g>
+                    </g>
+                  </svg>
+                </label>
+            </div>
+        </div>
+        <footer class="footer-bg py-4 d-flex justify-content-center align-items-center">
+            <div class="text-center">
+                <p>Created by
+                    <a href="https://github.com/Yonokid/IDCardEditor">Yonokid</a>
+                </p>
+            </div>
+        </footer>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-        <script
-			  src="https://code.jquery.com/jquery-3.7.1.js"
-			  integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
-			  crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap5-toggle@5.1.1/js/bootstrap5-toggle.ecmas.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bs-darkmode@2.0.0/js/bs-darkmode.jquery.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                const htmlElement = document.documentElement;
+                const switchElement = document.getElementById('darkModeSwitch');
+                const currentTheme = localStorage.getItem('bsTheme') || 'dark';
+                htmlElement.setAttribute('data-bs-theme', currentTheme);
+                switchElement.checked = currentTheme === 'dark';
+
+                switchElement.addEventListener('change', function () {
+                    if (this.checked) {
+                        htmlElement.setAttribute('data-bs-theme', 'dark');
+                        localStorage.setItem('bsTheme', 'dark');
+                    } else {
+                        htmlElement.setAttribute('data-bs-theme', 'light');
+                        localStorage.setItem('bsTheme', 'light');
+                    }
+                });
+            });
+        </script>
     </body>
 </html>
