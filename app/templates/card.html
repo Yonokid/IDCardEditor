@@ -2,86 +2,105 @@
 {% block content %}
 <form method="POST" action="{{ url_for('download', name=name) }}">
     <div class="mx-auto p-4">
-        <div class="row d-flex">
-            <!-- Left Column (Form Section) -->
-            <div class="col-md-6">
-                {% set options_map = {
-                    'Home Area': data[0],'Avatar Gender': data[1],
-                    'BGM Volume': data[2],'Selected Cup': data[7],
-                    'Tachometer': data[8],'Aura': data[9],
-                    'Class': data[10],'Title': data[11]} %}
-                {% set disabled_map = ['Game Version','Avatar','Car 1','Car 2','Car 3',
-                                       'Courses','Store Name','Number of Cars','Play Count','Story Losses',
-                                       'Story Wins','Total In-Store Plays','Total In-Store Wins','Course Proficiency'] %}
-                {% set boolean_map = ['Force Quit','Cornering Guide',
-                                      'Guide Line','Cup','Barricade',
-                                      'Ghost Car', 'Upload Scores'] %}
-                {% for key in card %}
-                    {% if card[key][1] %}
-                        {% if key == 'Game Version' %}
-                            <h1 class="text-left">Initial D {{ card[key][0] }} Card Editor</h1>
-                        {% else %}
-                            <div class="form-group">
-                                <label for="key_{{ key }}" class="form-label">{{ key }}:</label>
-                                {% if key == 'Wheel Sensitivity' %}
-                                    <div class="form-group">
-                                        <div class="btn-group" role="group" aria-label="Wheel Sensitivity">
-                                            {% for i in range(1, 11) %}
-                                                <button type="button" class="btn btn-outline-primary sensitivity-btn {% if card[key][0] == i %}active{% endif %}" data-value="{{ i }}">{{ i }}</button>
-                                            {% endfor %}
+        <h1 class="text-left">Initial D {{ card['Game Version'][0] }} Card Editor</h1>
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <button class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="true">Profile</button>
+            <button class="nav-link" id="nav-courseinfo-tab" data-bs-toggle="tab" data-bs-target="#nav-courseinfo" type="button" role="tab" aria-controls="nav-courseinfo" aria-selected="false">Course Info</button>
+            <button class="nav-link" id="nav-storyprogress-tab" data-bs-toggle="tab" data-bs-target="#nav-storyprogress" type="button" role="tab" aria-controls="nav-storyprogress" aria-selected="false">Story Progress</button>
+            <button class="nav-link" id="nav-cars-tab" data-bs-toggle="tab" data-bs-target="#nav-cars" type="button" role="tab" aria-controls="nav-cars" aria-selected="false">Cars</button>
+          </div>
+        </nav>
+        <div class="tab-content p-2" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <div class="row d-flex">
+                    <!-- Left Column (Form Section) -->
+                    <div class="col-md-6">
+                        {% set options_map = {
+                            'Home Area': data[0],'Avatar Gender': data[1],
+                            'BGM Volume': data[2],'Selected Cup': data[7],
+                            'Tachometer': data[8],'Aura': data[9],
+                            'Class': data[10],'Title': data[11]} %}
+                        {% set disabled_map = ['Game Version','Avatar','Car 1','Car 2','Car 3',
+                                                'Courses','Store Name','Number of Cars','Play Count','Story Losses',
+                                                'Story Wins','Total In-Store Plays','Total In-Store Wins','Course Proficiency'] %}
+                        {% set boolean_map = ['Force Quit','Cornering Guide',
+                                            'Guide Line','Cup','Barricade',
+                                            'Ghost Car', 'Upload Scores'] %}
+                        {% for key in card %}
+                            {% if card[key][1] %}
+                                <div class="form-group">
+                                    <label for="key_{{ key }}" class="form-label">{{ key }}:</label>
+                                    {% if key == 'Wheel Sensitivity' %}
+                                        <div class="form-group">
+                                            <div class="btn-group" role="group" aria-label="Wheel Sensitivity">
+                                                {% for i in range(1, 11) %}
+                                                    <button type="button" class="btn btn-outline-primary sensitivity-btn {% if card[key][0] == i %}active{% endif %}" data-value="{{ i }}">{{ i }}</button>
+                                                {% endfor %}
+                                            </div>
+                                            <input type="hidden" id="key_{{ key }}" name="key_{{ key }}" value="{{ card[key][0] }}" />
                                         </div>
-                                        <input type="hidden" id="key_{{ key }}" name="key_{{ key }}" value="{{ card[key][0] }}" />
-                                    </div>
-                                {% elif key in options_map %}
-                                    <select id="key_{{ key }}" name="key_{{ key }}" class="form-control">
-                                        {% for option in options_map[key] %}
-                                            <option value="{{ option }}" {% if card[key][0] == option %} selected {% endif %}>{{ option }}</option>
-                                        {% endfor %}
-                                    </select>
-                                {% elif key in disabled_map %}
-                                    <input type="text" id="key_{{ key }}" name="key_{{ key }}" value="{{ card[key][0] }}" class="form-control" disabled />
-                                {% elif key in boolean_map %}
-                                    <div class="form-check">
-                                        <input type="checkbox" id="key_{{ key }}" name="key_{{ key }}" value="1" {% if card[key][0] == 1 %}checked{% endif %} class="form-check-input" data-toggle="toggle" />
-                                        <input type="hidden" name="key_{{ key }}" value="0" />
-                                        <label for="key_{{ key }}" class="form-check-label">Enabled</label>
-                                    </div>
-                                {% else %}
-                                    <input type="text" id="key_{{ key }}" name="key_{{ key }}" value="{{ card[key][0] }}" class="form-control" />
-                                {% endif %}
+                                    {% elif key in options_map %}
+                                        <select id="key_{{ key }}" name="key_{{ key }}" class="form-control">
+                                            {% for option in options_map[key] %}
+                                                <option value="{{ option }}" {% if card[key][0] == option %} selected {% endif %}>{{ option }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% elif key in disabled_map %}
+                                        <input type="text" id="key_{{ key }}" name="key_{{ key }}" value="{{ card[key][0] }}" class="form-control" disabled />
+                                    {% elif key in boolean_map %}
+                                        <div class="form-check">
+                                            <input type="checkbox" id="key_{{ key }}" name="key_{{ key }}" value="1" {% if card[key][0] == 1 %}checked{% endif %} class="form-check-input" data-toggle="toggle" />
+                                            <input type="hidden" name="key_{{ key }}" value="0" />
+                                            <label for="key_{{ key }}" class="form-check-label"></label>
+                                        </div>
+                                    {% else %}
+                                        <input type="text" id="key_{{ key }}" name="key_{{ key }}" value="{{ card[key][0] }}" class="form-control" />
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <!-- Right Column (Other Data Section) -->
+                    <div class="col-md-6">
+                        <h2 class="text-left">Avatar</h2>
+                        <div class="row">
+                            <div class="col-md-auto">
+                                <div style="width: 256px; height: 256px;">
+                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/BG/' + str(card['My Frame'][0]) + '_bg.png') }}">
+                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][0]) + '.png') }}">
+                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][1]) + '.png') }}">
+                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][2]) + '.png') }}">
+                                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][3]) + '.png') }}">
+                                    {% if int(card['Avatar'][0][6]) != 0 %}
+                                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '.png') }}">
+                                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][6]) + '_bg.png') }}">
+                                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][6]) + '_fg.png') }}">
+                                    {% else %}
+                                        {% if int(card['Avatar'][0][5]) != 0 %}
+                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '.png') }}">
+                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '_bg.png') }}">
+                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '_fg.png') }}">
+                                        {% else %}
+                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '_bg.png') }}">
+                                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '_fg.png') }}">
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
                             </div>
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
-                <!-- Submit Button -->
-                <div class="text-left mt-4">
-                    <button type="submit" class="btn btn-primary">Apply Changes</button>
+                            <div class="col">
+                                <label for="key_{{ 'Avatar Gender' }}" class="form-label">{{ 'Avatar Gender' }}:</label>
+                                <select id="key_{{ 'Avatar Gender' }}" name="key_{{ 'Avatar Gender' }}" class="form-control">
+                                    {% for option in options_map['Avatar Gender'] %}
+                                        <option value="{{ option }}" {% if card['Avatar Gender'][0] == option %} selected {% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- Right Column (Other Data Section) -->
-            <div class="col-md-6">
-                <h2 class="text-left">Avatar</h2>
-                <div style="width: 256px; height: 256px;">
-                    <img class="position-absolute" src="{{ url_for('static', filename='D8/BG/' + str(card['My Frame'][0]) + '_bg.png') }}">
-                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][0]) + '.png') }}">
-                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][1]) + '.png') }}">
-                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][2]) + '.png') }}">
-                    <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][3]) + '.png') }}">
-                    {% if int(card['Avatar'][0][6]) != 0 %}
-                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '.png') }}">
-                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][6]) + '_bg.png') }}">
-                        <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][6]) + '_fg.png') }}">
-                    {% else %}
-                        {% if int(card['Avatar'][0][5]) != 0 %}
-                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '.png') }}">
-                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '_bg.png') }}">
-                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][5]) + '_fg.png') }}">
-                        {% else %}
-                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '_bg.png') }}">
-                            <img class="position-absolute" src="{{ url_for('static', filename='D8/' + card['Avatar Gender'][0] + '/' + str(card['Avatar'][0][4]) + '_fg.png') }}">
-                        {% endif %}
-                    {% endif %}
-                </div>
+            <div class="tab-pane fade" id="nav-courseinfo" role="tabpanel" aria-labelledby="nav-courseinfo-tab">
                 <h2 class="text-left">Course Times</h2>
                 <table class="table table-bordered">
                     <thead>
@@ -120,6 +139,32 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                <p class="text-left">Course Proficiency: {{ card['Course Proficiency'][0]}}</p>
+            </div>
+            <div class="tab-pane fade" id="nav-storyprogress" role="tabpanel" aria-labelledby="nav-storyprogress-tab">
+                <h2 class="text-left">Story Wins: {{ card['Story Wins'][0] }}</h2>
+                <h2 class="text-left">Story Losses: {{ card['Story Losses'][0] }}</h2>
+                <h2 class="text-left">Infinity Rank: {{ card['Infinity Rank'][0] }}</h2>
+                <p class="text-left">{{ card['Story Progress'][0] }}</p>
+            </div>
+            <div class="tab-pane fade" id="nav-cars" role="tabpanel" aria-labelledby="nav-cars-tab">
+                <h2 class="text-left">Number of Cars: {{ card["Number of Cars"][0] }}</h2>
+                <label for="key_{{ 'Current Car' }}" class="form-label">{{ 'Current Car' }}:</label>
+                <div class="form-group p-2">
+                    <select id="key_{{ key }}" name="key_{{ key }}" class="form-control">
+                        {% for i in range(1, card['Number of Cars'][0]+1) %}
+                            <option value="{{ i }}" {% if card['Current Car'][0] == i %} selected {% endif %}>{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="hidden" id="key_{{ 'Current Car' }}" name="key_{{ 'Current Car' }}" value="{{ card['Current Car'][0] }}" />
+                </div>
+                {% for i in range(card["Number of Cars"][0]) %}
+                    <p class="text-left">Car {{ i+1 }}: {{ card['Car ' + (i+1)|string] }}</p>
+                {% endfor %}
+            </div>
+            <!-- Submit Button -->
+            <div class="text-left mt-4">
+                <button type="submit" class="btn btn-primary">Apply Changes</button>
             </div>
         </div>
     </div>

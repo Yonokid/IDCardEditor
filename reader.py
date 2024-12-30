@@ -3,6 +3,7 @@ import sys
 from bidict import bidict
 import psycopg2
 import random
+import ast
 
 card_version_dict = bidict({"0xFFFF": "4", "0x5210": "5", "0x6013": "6 AA", "0x7012": "7 AAX", "0x8015": "8 Infinity"})
 model_dict = {"Toyota": ["TRUENO GT-APEX (AE86)", "LEVIN GT-APEX (AE86)", "LEVIN SR (AE85)", "86 GT (ZN6)", "MR2 G-Limited (SW20)", "MR-S (ZZW30)", "ALTEZZA RS200 (SXE10)", "SUPRA RZ (JZA80)", "PRIUS (ZVW30)", "SPRINTER TRUENO 2door GT-APEX (AE86)", "CELICA GT-FOUR (ST205)"],
@@ -15,6 +16,21 @@ model_dict = {"Toyota": ["TRUENO GT-APEX (AE86)", "LEVIN GT-APEX (AE86)", "LEVIN
               "Initial D": ["SILEIGHTY", "TRUENO 2door GT-APEX (AE86)"],
               "Complete": ["G-FORCE SUPRA (JZA80-kai)", "MONSTER CIVIC R (EK9)", "S2000 GT1 (AP1)", "RE Amemiya Genki-7 (FD3S)", "NSX-R GT (NA2)", "ROADSTER C-SPEC (NA8C Kai)"]
               }
+story_list = ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-7', '1-8', '1-9', '1-10',
+              '2-1', '2-2', '2-3', '2-4', '2-5', '2-6', '2-7',
+              '3-1', '3-2', '3-3', '3-4', '3-5', '3-6', '3-7', '3-8',
+              '4-1', '4-2', '4-3', '4-4', '4-5', '4-6', '4-7', '4-8', '4-9',
+              '5-1', '5-2', '5-3', '5-4', '5-5', '5-6',
+              '6-1', '6-2', '6-3', '6-4', '6-5',
+              '7-1', '7-2', '7-3', '7-4', '7-5', '7-6', '7-7',
+              '8-1', '8-2', '8-3', '8-4',
+              '9-1', '9-2', '9-3', '9-4', '9-5',
+              '10-1', '10-2',
+              '11-1', '11-2', '11-3', '11-4', '11-5',
+              '12-1', '12-2', '12-3', '12-4', '12-5',
+              '13-1', '13-2', '13-3', '13-4', '13-5', '13-6',
+              '14-1', '14-2', '14-3', '14-4', '14-5', '14-6', '14-7', '14-8',
+              '15-1', '15-2']
 data_dict = dict()
 
 def read_txt(filename):
@@ -132,11 +148,11 @@ def read_card(filename):
     course_times_list = read_txt('app/static/times.txt')
 
     header = f.read(80)
-    data_dict["Game Version"] = [card_version_dict[pretty_bytes(f.read(2), byte_order='little')], True]
+    data_dict["Game Version"] = [card_version_dict[pretty_bytes(f.read(2), byte_order='little')], False]
     data_dict["Issued Store"] = [pretty_bytes(f.read(2)), False]
     data_dict["User ID"] = [int.from_bytes(f.read(4), byteorder="little", signed=True), False]
     data_dict["Home Area"] = [prefectures[int.from_bytes(f.read(2), byteorder="little")], True]
-    data_dict["Avatar Gender"] = [avatar_gender_list[int.from_bytes(f.read(2), byteorder="little")], True]
+    data_dict["Avatar Gender"] = [avatar_gender_list[int.from_bytes(f.read(2), byteorder="little")], False]
     data_dict["Previous Card ID"] = [int.from_bytes(f.read(4), byteorder="little"), False]
     for i in range(3):
         dcoin = int.from_bytes(f.read(2), byteorder="little")
@@ -172,8 +188,8 @@ def read_card(filename):
     data_dict["Class"] = [class_list[int.from_bytes(f.read(1), byteorder="little")-1], True]
     data_dict["Class (Match)"] = [class_list[int.from_bytes(f.read(1), byteorder="little")], False]
     data_dict["Class (Tag Match)"] = [class_list[int.from_bytes(f.read(1), byteorder="little")], False]
-    data_dict["Current Car"] = [int.from_bytes(f.read(1), byteorder="little"), True]
-    data_dict["Number of Cars"] = [int.from_bytes(f.read(1), byteorder="little"), True]
+    data_dict["Current Car"] = [int.from_bytes(f.read(1), byteorder="little"), False]
+    data_dict["Number of Cars"] = [int.from_bytes(f.read(1), byteorder="little"), False]
     data_dict["Play Count"] = [int.from_bytes(f.read(2), byteorder="little"), True]
     data_dict["Pride Points"] = [int.from_bytes(f.read(2), byteorder="little"), False]
     data_dict["Tag Pride Points"] = [int.from_bytes(f.read(2), byteorder="little"), False]
@@ -209,7 +225,7 @@ def read_card(filename):
         car_dict["Numplate Class Code"] = int.from_bytes(f.read(2), byteorder="little")
         car_dict["Numplate Plate Number"] = int.from_bytes(f.read(4), byteorder="little")
         car_dict["Customizations"] = pretty_bytes(f.read(64))
-        data_dict[f"Car {i+1}"] = [car_dict, True]
+        data_dict[f"Car {i+1}"] = [car_dict, False]
     for i in range(3 - data_dict["Number of Cars"][0]):
         f.read(96)
     data_dict["Avatar Points"] = [int.from_bytes(f.read(1), byteorder="little"), False]
@@ -220,14 +236,33 @@ def read_card(filename):
     data_dict["Battle Stance"] = [int.from_bytes(f.read(1), byteorder="little"), True]
     data_dict["CRC11"] = [pretty_bytes(f.read(2)), False]
     padding = f.read(2)
-    data_dict["Story Losses"] = [int.from_bytes(f.read(2), byteorder="little"), True]
-    data_dict["Story Wins"] = [int.from_bytes(f.read(2), byteorder="little"), True]
+    data_dict["Story Losses"] = [int.from_bytes(f.read(2), byteorder="little"), False]
+    data_dict["Story Wins"] = [int.from_bytes(f.read(2), byteorder="little"), False]
     padding = f.read(6)
     data_dict["Infinity Result Data 1"] = [pretty_bytes(f.read(1)), False]
     data_dict["Infinity Result Data 2"] = [pretty_bytes(f.read(1)), False]
-    data_dict["Infinity Rank"] = [int.from_bytes(f.read(2), byteorder="little"), True]
-    data_dict["Story Progress"] = [pretty_bytes(f.read(24)), True]
-    padding = f.read(4)
+    data_dict["Infinity Rank"] = [int.from_bytes(f.read(2), byteorder="little"), False]
+    story_progress = f.read(23)
+    story_progress_list = []
+    story_progress_dict = dict()
+    for byte in story_progress:
+        binary_byte = str(bin(byte))[2:]
+        episodes = [binary_byte[i:i+2] for i in range(0, len(binary_byte), 2)]
+        story_progress_list.extend(episodes)
+    for i in range(len(story_progress_list)-3):
+        if story_progress_list[i] == '00':
+            story_progress_dict[story_list[i]] = 'Not Played'
+        elif story_progress_list[i] == '01':
+            story_progress_dict[story_list[i]] = 'A'
+        elif story_progress_list[i] == '10':
+            story_progress_dict[story_list[i]] = 'S'
+        elif story_progress_list[i] == '11':
+            story_progress_dict[story_list[i]] = 'SS'
+        else:
+            raise Exception('Story progress corrupted')
+    data_dict["Story Progress"] = [story_progress_dict, False]
+
+    padding = f.read(5)
     course_dict = dict()
     for i in range(len(courses)):
         course = courses[i]
@@ -280,7 +315,7 @@ def read_card(filename):
     for i in range(16):
         course = courses[i*2]
         course_proficiency_dict[course[:-5].rstrip()] = int.from_bytes(f.read(2), byteorder="little")
-    data_dict["Course Proficiency"] = [course_proficiency_dict, True]
+    data_dict["Course Proficiency"] = [course_proficiency_dict, False]
     for i in range(3):
         data_dict[f"Pro D Mission Flag {i}"] = [pretty_bytes(f.read(2)), False]
     data_dict["Pro D Mission Page"] = [int.from_bytes(f.read(2), byteorder="little"), False]
@@ -442,8 +477,26 @@ def write_card(filename, data_dict, user_id):
     f.write(safe_bytes(data_dict["Infinity Result Data 1"][0], 1))
     f.write(safe_bytes(data_dict["Infinity Result Data 2"][0], 1))
     f.write(safe_bytes(int(data_dict["Infinity Rank"][0]), 2))
-    f.write(safe_bytes(data_dict["Story Progress"][0], 24))
-    padding = f.read(4)
+    binary_list = []
+    #print(type(data_dict["Story Progress"][0]))
+    for story in story_list:
+        progress = data_dict["Story Progress"][0][story]
+        if progress == 'Not Played':
+            binary_chunk = '00'
+        elif progress == 'A':
+            binary_chunk = '01'
+        elif progress == 'S':
+            binary_chunk = '10'
+        elif progress == 'SS':
+            binary_chunk = '11'
+        else:
+            raise Exception('Invalid progress state')
+        binary_list.append(binary_chunk)
+    binary_string = ''.join(binary_list)
+    binary_string += '000000'
+    byte_list = [int(binary_string[i:i+8], 2) for i in range(0, len(binary_string), 8)]
+    f.write(bytes(byte_list))
+    padding = f.read(5)
     course_dict = data_dict["Courses"][0]
     for i in range(len(courses)):
         course = courses[i]
