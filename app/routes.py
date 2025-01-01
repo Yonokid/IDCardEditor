@@ -16,6 +16,10 @@ app.jinja_env.globals.update(int=int)
 
 load_dotenv()
 
+def fix_underscore(value):
+    return value.replace(" ", "_")
+app.jinja_env.globals.update(replace=fix_underscore)
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

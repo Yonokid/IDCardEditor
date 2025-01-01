@@ -82,7 +82,7 @@
                             <label for="key_Class" class="form-label">Class:</label>
                             <select id="key_Class" name="key_Class" class="form-control">
                                 {% for option in options_map['Class'] %}
-                                    <option value="{{ option }}" {% if card['Class'] == option %} selected {% endif %}>{{ option }}</option>
+                                    <option value="{{ option }}" {% if card['Class'] == option %} selected {% endif %} data-image="{{ url_for('static', filename='D8/Class/' + option + '.png') }}">{{ option }}</option>
                                 {% endfor %}
                             </select>
                             <label for="key_Driver Points" class="form-label">Driver Points:</label>
@@ -219,7 +219,36 @@
                 <h2 class="text-left">Story Wins: {{ card['Story Wins'] }}</h2>
                 <h2 class="text-left">Story Losses: {{ card['Story Losses'] }}</h2>
                 <h2 class="text-left">Infinity Rank: {{ card['Infinity Rank'] }}</h2>
-                <p class="text-left">{{ card['Story Progress'] }}</p>
+                {% for i in range(1, len(card["Story Progress"])+1) %}
+                    <div class="d-flex p-4">
+                        <img class="image-chapter" src="{{ url_for('static', filename='D8/Story/Chapter/' + i|string + '.png')}}">
+                        {% if card["Story Progress"][str(i)][len(card["Story Progress"][str(i)])-1][1] %}
+                        <img class="image-summary" src="{{ url_for('static', filename='D8/Story/SC.png')}}">
+                        {% elif card["Story Progress"][str(i)][len(card["Story Progress"][str(i)])-1][0] %}
+                        <img class="image-summary" src="{{ url_for('static', filename='D8/Story/RS.png')}}">
+                        {% endif %}
+                        {% for j in range(len(card["Story Progress"][str(i)])-1) %}
+                        <div class="image-container" style="position: relative">
+                            <img id="image1" class="image-episode" src="{{ url_for('static', filename='D8/Story/1.png')}}">
+                            <img id="image2" class="image-episode image-episode-frame" src="{{ url_for('static', filename='D8/Story/3.png')}}">
+                            {% if card["Story Progress"][str(i)][j][1] == 'SS' %}
+                                <img class="image-episode image-episode-frame image-episode-class" src="{{ url_for('static', filename='D8/Story/SS.png')}}">
+                            {% elif card["Story Progress"][str(i)][j][1] == 'S' %}
+                                <img class="image-episode image-episode-frame image-episode-class" src="{{ url_for('static', filename='D8/Story/S.png')}}">
+                            {% elif card["Story Progress"][str(i)][j][1] == 'A' %}
+                                <img class="image-episode image-episode-frame image-episode-class" style="transform: translate(0px, -50px);" src="{{ url_for('static', filename='D8/Story/A.png')}}">
+                            {% endif %}
+                            {% if j == len(card["Story Progress"][str(i)])-2 %}
+                                <img class="image-episode image-episode-frame image-episode-title" src="{{ url_for('static', filename='D8/Story/Episode/PublicRoads.png') }}">
+                            {% elif j == len(card["Story Progress"][str(i)])-3 %}
+                                <img class="image-episode image-episode-frame image-episode-title" src="{{ url_for('static', filename='D8/Story/Episode/Final.png') }}">
+                            {% else %}
+                                <img class="image-episode image-episode-frame image-episode-title" src="{{ url_for('static', filename='D8/Story/Episode/' + str(j+1)|string + '.png')}}">
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
             </div>
             <div class="tab-pane fade" id="nav-cars" role="tabpanel" aria-labelledby="nav-cars-tab">
                 <h2 class="text-left">Number of Cars: {{ card["Number of Cars"] }}</h2>
@@ -232,9 +261,20 @@
                     </select>
                     <input type="hidden" id="key_{{ 'Current Car' }}" name="key_{{ 'Current Car' }}" value="{{ card['Current Car'] }}" />
                 </div>
-                {% for i in range(card["Number of Cars"]) %}
-                    <p class="text-left">Car {{ i+1 }}: {{ card['Car ' + (i+1)|string] }}</p>
-                {% endfor %}
+                <div class="row justify-content-md-center">
+                    {% for i in range(card["Number of Cars"]) %}
+                    <div class="col-4 text-center">
+                        <h1><b>CAR {{ i + 1}}</b></h1>
+                        <h3>{{ card['Car ' + (i+1)|string]['Make'] }}</h3>
+                        <h5>{{ card['Car ' + (i+1)|string]['Model'] }}</h5>
+                        <img style="width: 410px; height: 230px;"src="{{ url_for('static', filename='D8/Cars/' + card['Car ' + (i+1)|string]['Make'] + '_' + replace(card['Car ' + (i+1)|string]['Model'])) + '_IDAS8' + '.webp' }}">
+                        <div class="bg-white rounded text-black p-1 car-license-plate">
+                            <p class="justify-content-center align-items-center d-flex" style="margin-bottom: 0px;"><span class="numplate-prefecture">{{ card['Car ' + (i+1)|string]['Numplate Prefecture'] }}</span><span class="numplate-class-code">{{ card['Car ' + (i+1)|string]['Numplate Class Code'] }}</span></p>
+                            <p class="justify-content-center align-items-center d-flex" style="margin-bottom: 0px;"><span class="numplate-hirigana">{{ card['Car ' + (i+1)|string]['Numplate Hirigana'] }}</span> <span class="numplate-plate-number">{{ card['Car ' + (i+1)|string]['Numplate Plate Number'] }}</span></p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
             <div class="text-left mt-4">
                 <button type="submit" class="btn btn-primary">Apply Changes</button>
@@ -260,4 +300,22 @@
         });
     });
 </script>
+<script>
+    const imageContainers = document.querySelectorAll('.image-container');
+    imageContainers.forEach(container => {
+        const image1 = container.querySelector('img:nth-of-type(1)');
+        const image2 = container.querySelector('img:nth-of-type(2)');
+
+        container.addEventListener('mouseover', function() {
+            image1.src = '{{ url_for("static", filename="D8/Story/2.png") }}';
+            image2.src = '{{ url_for("static", filename="D8/Story/4.png") }}';
+        });
+
+        container.addEventListener('mouseout', function() {
+            image1.src = '{{ url_for("static", filename="D8/Story/1.png") }}';
+            image2.src = '{{ url_for("static", filename="D8/Story/3.png") }}';
+        });
+    });
+</script>
+
 {% endblock %}

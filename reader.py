@@ -260,15 +260,12 @@ def read_card(f):
     data_dict["Infinity Rank"] = int.from_bytes(f.read(2), byteorder="little")
     story_progress = f.read(23)
     story_progress_list = bytes_to_2bit_strings(story_progress)
-    print(story_progress_list)
     story_progress_dict = dict()
     for byte in story_progress:
         binary_byte = str(bin(byte))[2:]
         episodes = [binary_byte[i:i+2] for i in range(0, len(binary_byte), 2)]
         story_progress_list.extend(episodes)
-    print(len(story_progress_list))
     for i in range(len(story_list)):
-        print(story_progress_list[i])
         if story_progress_list[i] in ('0', '00'):
             story_progress_dict[story_list[i]] = 'Not Played'
         elif story_progress_list[i] in ('01', '1'):
@@ -279,7 +276,30 @@ def read_card(f):
             story_progress_dict[story_list[i]] = 'SS'
         else:
             raise Exception('Story progress corrupted')
-    data_dict["Story Progress"] = story_progress_dict
+    grouped_dict = {}
+    for key, value in story_progress_dict.items():
+        outer_key = key.split('-')[0]  # Get the first part before the hyphen
+        if outer_key not in grouped_dict:
+            grouped_dict[outer_key] = []
+        grouped_dict[outer_key].append((key, value))
+    for chapter in grouped_dict:
+        rs = None
+        sc = None
+        for episode in grouped_dict[chapter]:
+            if episode[1] in ('A', 'Not Played'):
+                rs = False
+                sc = False
+                break
+            elif episode[1] == 'S':
+                rs = True
+                sc = False
+                break
+            elif episode[1] == 'SS':
+                rs = True
+                sc = True
+        grouped_dict[chapter].append((rs, sc))
+    data_dict["Story Progress"] = grouped_dict
+    print(grouped_dict)
 
     padding = f.read(5)
     course_dict = dict()
