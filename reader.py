@@ -31,6 +31,21 @@ story_list = ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-7', '1-8', '1-9', '1-
               '13-1', '13-2', '13-3', '13-4', '13-5', '13-6',
               '14-1', '14-2', '14-3', '14-4', '14-5', '14-6', '14-7', '14-8',
               '15-1', '15-2']
+rival_list = ['9', '11', 'EX_4', '1', '4', '12', 'EX_1', '14', '47', '1',
+              '13', 'EX_5', '10', '47', '1', '17', '4',
+              '15', '11', 'EX_6', '4', '18', 'EX_5', '16', '16',
+              '14', 'EX_6', '4', '19', '42', 'EX_5', '21', '28', '1',
+              '42', '23', 'EX_5', '49', '2', '5',
+              '22', '21', 'EX_6', '7', '2',
+              '43', '24', 'EX_6', 'EX_5', '44', '18', '2',
+              '50', 'EX_6', '51', '5',
+              '26', '21', '22', '25', '5',
+              'EX_6', '29',
+              '31', '20', 'EX_5', '33', '2',
+              '30', 'EX_6', '32', '35', '6',
+              '36', '33', 'EX_5', '35', '37', '3',
+              '34', '35', '41', 'EX_6', '53', 'EX_6', '52', '8',
+              '40', '4']
 data_dict = dict()
 
 def read_txt(filename):
@@ -88,15 +103,9 @@ def time_to_ms(time_str):
 #def skip(distance):
     #return .seek(distance, .tell)
 def bytes_to_2bit_strings(byte_data):
-    # List to hold the 2-bit strings
     result = []
-
-    # Process each byte
     for byte in byte_data:
-        # Convert the byte to its binary representation (padded to 8 bits)
         binary_str = format(byte, '08b')
-
-        # Split the binary string into chunks of 2 bits
         for i in range(0, 8, 2):
             result.append(binary_str[i:i+2])
 
@@ -277,11 +286,17 @@ def read_card(f):
         else:
             raise Exception('Story progress corrupted')
     grouped_dict = {}
+    i = 0
     for key, value in story_progress_dict.items():
         outer_key = key.split('-')[0]  # Get the first part before the hyphen
+        if i < len(rival_list):
+            rival = rival_list[i]
+        else:
+            rival = '0'
         if outer_key not in grouped_dict:
             grouped_dict[outer_key] = []
-        grouped_dict[outer_key].append((key, value))
+        grouped_dict[outer_key].append((key, value, rival))
+        i += 1
     for chapter in grouped_dict:
         rs = None
         sc = None

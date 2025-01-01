@@ -230,6 +230,7 @@
                         {% for j in range(len(card["Story Progress"][str(i)])-1) %}
                         <div class="image-container" style="position: relative">
                             <img id="image1" class="image-episode" src="{{ url_for('static', filename='D8/Story/1.png')}}">
+                            <img class="image-episode image-episode-rival" src="{{ url_for('static', filename='D8/Story/RivalPortrait/' + card['Story Progress'][str(i)][j][2] + '.png' )}}">
                             <img id="image2" class="image-episode image-episode-frame" src="{{ url_for('static', filename='D8/Story/3.png')}}">
                             {% if card["Story Progress"][str(i)][j][1] == 'SS' %}
                                 <img class="image-episode image-episode-frame image-episode-class" src="{{ url_for('static', filename='D8/Story/SS.png')}}">
@@ -304,7 +305,7 @@
     const imageContainers = document.querySelectorAll('.image-container');
     imageContainers.forEach(container => {
         const image1 = container.querySelector('img:nth-of-type(1)');
-        const image2 = container.querySelector('img:nth-of-type(2)');
+        const image2 = container.querySelector('img:nth-of-type(3)');
 
         container.addEventListener('mouseover', function() {
             image1.src = '{{ url_for("static", filename="D8/Story/2.png") }}';
