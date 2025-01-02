@@ -10,13 +10,14 @@ from dotenv import load_dotenv
 from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
-app.config['SECRET_KEY'] = 'super cool secret key'
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
 app.jinja_env.globals.update(len=len)
 app.jinja_env.globals.update(str=str)
 app.jinja_env.globals.update(int=int)
-Session(app)
+app.config['SECRET_KEY'] = 'super cool secret key'
+#app.secret_key = 'even superer cool secret key'
+#app.config["SESSION_PERMANENT"] = False
+#app.config["SESSION_TYPE"] = "memcached"
+#Session(app)
 
 load_dotenv()
 
