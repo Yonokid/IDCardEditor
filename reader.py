@@ -269,50 +269,43 @@ def read_card(f):
     data_dict["Infinity Rank"] = int.from_bytes(f.read(2), byteorder="little")
     story_progress = f.read(23)
     story_progress_list = bytes_to_2bit_strings(story_progress)
-    story_progress_dict = dict()
+    story_progress_list = []
     for byte in story_progress:
-        binary_byte = str(bin(byte))[2:]
-        episodes = [binary_byte[i:i+2] for i in range(0, len(binary_byte), 2)]
-        story_progress_list.extend(episodes)
-    for i in range(len(story_list)):
-        if story_progress_list[i] in ('0', '00'):
-            story_progress_dict[story_list[i]] = 'Not Played'
-        elif story_progress_list[i] in ('01', '1'):
-            story_progress_dict[story_list[i]] = 'A'
-        elif story_progress_list[i] == '10':
-            story_progress_dict[story_list[i]] = 'S'
-        elif story_progress_list[i] == '11':
-            story_progress_dict[story_list[i]] = 'SS'
+        binary_byte = format(byte, '08b')
+        story_progress_list.extend([binary_byte[i:i+2] for i in range(0, len(binary_byte), 2)])
+    story_progress_dict = {}
+    for i, story in enumerate(story_list):
+        progress = story_progress_list[i]
+        if progress in ('0', '00'):
+            story_progress_dict[story] = 'Not Played'
+        elif progress in ('01', '1'):
+            story_progress_dict[story] = 'A'
+        elif progress == '10':
+            story_progress_dict[story] = 'S'
+        elif progress == '11':
+            story_progress_dict[story] = 'SS'
         else:
             raise Exception('Story progress corrupted')
     grouped_dict = {}
-    i = 0
-    for key, value in story_progress_dict.items():
-        outer_key = key.split('-')[0]  # Get the first part before the hyphen
-        if i < len(rival_list):
-            rival = rival_list[i]
-        else:
-            rival = '0'
-        if outer_key not in grouped_dict:
-            grouped_dict[outer_key] = []
-        grouped_dict[outer_key].append((key, value, rival))
-        i += 1
-    for chapter in grouped_dict:
-        rs = None
-        sc = None
-        for episode in grouped_dict[chapter]:
-            if episode[1] in ('A', 'Not Played'):
-                rs = False
-                sc = False
+    for i, (story, progress) in enumerate(story_progress_dict.items()):
+        chapter = story.split('-')[0]  # Extract chapter name
+        rival = rival_list[i] if i < len(rival_list) else '0'
+        if chapter not in grouped_dict:
+            grouped_dict[chapter] = []
+        grouped_dict[chapter].append((story, progress, rival))
+    for chapter, episodes in grouped_dict.items():
+        rs, sc = None, None
+        for episode in episodes:
+            progress = episode[1]
+            if progress in ('A', 'Not Played'):
+                rs, sc = False, False
                 break
-            elif episode[1] == 'S':
-                rs = True
-                sc = False
+            elif progress == 'S':
+                rs, sc = True, False
                 break
-            elif episode[1] == 'SS':
-                rs = True
-                sc = True
-        grouped_dict[chapter].append((rs, sc))
+            elif progress == 'SS':
+                rs, sc = True, True
+        episodes.append((rs, sc))
     data_dict["Story Progress"] = grouped_dict
     print(grouped_dict)
 
@@ -521,7 +514,7 @@ def write_card(f, data_dict, user_id):
     f.write(safe_bytes(cup_list.index(data_dict["Selected Cup"]), 1))
     f.write(safe_bytes(tachometer_list.index(data_dict["Tachometer"]), 1))
     padding = f.read(1)
-    f.write(safe_bytes(data_dict["Battle Stance"], 1))
+    f.write(safe_bytes(int(data_dict["Battle Stance"]), 1))
     f.write(safe_bytes(data_dict["CRC11"], 2))
     padding = f.read(2)
     f.write(safe_bytes(data_dict["Story Losses"], 2))
@@ -530,25 +523,29 @@ def write_card(f, data_dict, user_id):
     f.write(safe_bytes(data_dict["Infinity Result Data 1"], 1))
     f.write(safe_bytes(data_dict["Infinity Result Data 2"], 1))
     f.write(safe_bytes(int(data_dict["Infinity Rank"]), 2))
-    binary_list = []
-    for story in story_list:
-        progress = data_dict["Story Progress"][story]
-        if progress == 'Not Played':
-            binary_chunk = '00'
-        elif progress == 'A':
-            binary_chunk = '01'
-        elif progress == 'S':
-            binary_chunk = '10'
-        elif progress == 'SS':
-            binary_chunk = '11'
-        else:
-            raise Exception('Invalid progress state')
-        binary_list.append(binary_chunk)
-    binary_string = ''.join(binary_list)
-    binary_string += '000000'
-    byte_list = [int(binary_string[i:i+8], 2) for i in range(0, len(binary_string), 8)]
-    f.write(bytes(byte_list))
-    padding = f.read(5)
+    story_progress_list = []
+    for chapter, episodes in data_dict["Story Progress"].items():
+        no_rs_sc = episodes[:-1]
+        for episode in no_rs_sc:
+            story, progress, rival = episode
+            if progress == 'Not Played':
+                binary_progress = '00'
+            elif progress == 'A':
+                binary_progress = '01'
+            elif progress == 'S':
+                binary_progress = '10'
+            elif progress == 'SS':
+                binary_progress = '11'
+            else:
+                raise Exception('Invalid progress state')
+            story_progress_list.append(binary_progress)
+    story_progress_bytes = []
+    for i in range(0, len(story_progress_list), 4):
+        binary_byte = ''.join(story_progress_list[i:i+4])
+        if len(binary_byte) == 8:
+            story_progress_bytes.append(int(binary_byte, 2))
+    f.write(bytes(story_progress_bytes))
+    padding = f.read(6)
     course_dict = data_dict["Courses"]
     for i in range(len(courses)):
         course = courses[i]

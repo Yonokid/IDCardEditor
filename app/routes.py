@@ -1,4 +1,5 @@
 from flask import render_template, request, flash, redirect, url_for, send_file, session
+from flask_session import Session
 from werkzeug.utils import secure_filename
 from app import app
 from reader import *
@@ -10,9 +11,12 @@ from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
 app.config['SECRET_KEY'] = 'super cool secret key'
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
 app.jinja_env.globals.update(len=len)
 app.jinja_env.globals.update(str=str)
 app.jinja_env.globals.update(int=int)
+Session(app)
 
 load_dotenv()
 

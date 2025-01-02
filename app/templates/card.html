@@ -237,7 +237,7 @@
                             {% elif card["Story Progress"][str(i)][j][1] == 'S' %}
                                 <img class="image-episode image-episode-frame image-episode-class" src="{{ url_for('static', filename='D8/Story/S.png')}}">
                             {% elif card["Story Progress"][str(i)][j][1] == 'A' %}
-                                <img class="image-episode image-episode-frame image-episode-class" style="transform: translate(0px, -50px);" src="{{ url_for('static', filename='D8/Story/A.png')}}">
+                                <img class="image-episode image-episode-frame image-episode-class" src="{{ url_for('static', filename='D8/Story/A.png')}}">
                             {% endif %}
                             {% if j == len(card["Story Progress"][str(i)])-2 %}
                                 <img class="image-episode image-episode-frame image-episode-title" src="{{ url_for('static', filename='D8/Story/Episode/PublicRoads.png') }}">
