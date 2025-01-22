@@ -1,9 +1,8 @@
 import os
-import sys
-from bidict import bidict
-import psycopg2
 import random
-import ast
+
+import psycopg2
+from bidict import bidict
 
 card_version_dict = bidict({"0xFFFF": "4", "0x5210": "5", "0x6013": "6 AA", "0x7012": "7 AAX", "0x8015": "8 Infinity"})
 model_dict = {"Toyota": ["TRUENO GT-APEX (AE86)", "LEVIN GT-APEX (AE86)", "LEVIN SR (AE85)", "86 GT (ZN6)", "ALTEZZA RS200 (SXE10)", "MR-S (ZZW30)", "MR2 G-Limited (SW20)", "SUPRA RZ (JZA80)", "PRIUS (ZVW30)", "SPRINTER TRUENO 2door GT-APEX (AE86)", "CELICA GT-FOUR (ST205)"],
@@ -172,7 +171,7 @@ def read_card(f):
     title_list = read_txt('app/static/titles.txt')
     course_times_list = read_txt('app/static/times.txt')
 
-    header = f.read(80)
+    _ = f.read(80)
     data_dict["Game Version"] = card_version_dict[pretty_bytes(f.read(2), byte_order='little')]
     data_dict["Issued Store"] = pretty_bytes(f.read(2))
     data_dict["User ID"] = int.from_bytes(f.read(4), byteorder="little", signed=True)
@@ -202,7 +201,7 @@ def read_card(f):
     else:
         data_dict["Wheel Sensitivity"] = int(config_flag_1[3])
     data_dict["BGM Volume"] = bgm_volume_list[int(config_flag_1[2])]
-    config_flag_2 = pretty_bytes(f.read(1))
+    _ = pretty_bytes(f.read(1))
     config_flag_3 = bin(int.from_bytes(f.read(1), byteorder="little"))[2:].zfill(8)
     data_dict["Force Quit"] = int(config_flag_3[7])
     data_dict["Cornering Guide"] = int(config_flag_3[6])
@@ -225,7 +224,7 @@ def read_card(f):
     data_dict["Driver Flags"] = pretty_bytes(f.read(4))
     data_dict["Driver Points"] = int.from_bytes(f.read(4), byteorder="little")
     data_dict["Avatar"] = get_avatar_from_card(f.read(12))
-    padding = f.read(32)
+    _ = f.read(32)
     data_dict["Driver Name"] = (f.read(14).rstrip(b'\x00')).decode('shift-jis')
     data_dict["CRC01"] = pretty_bytes(f.read(2))
     for i in range(data_dict["Number of Cars"]):
@@ -238,13 +237,13 @@ def read_card(f):
         car_dict["Tuning"] = pretty_bytes(f.read(2))
         car_dict["Option Flag"] = pretty_bytes(f.read(2))
         car_dict["Car Flag"] = pretty_bytes(f.read(2))
-        padding = f.read(2)
+        _ = f.read(2)
         for j in range(4):
             car_dict[f"Event Sticker {j+1}"] = int.from_bytes(f.read(1), byteorder="little", signed=True)
         car_dict["Battle Wins"] = int.from_bytes(f.read(2), byteorder="little")
         car_dict["Bought Sequence ID"] = int.from_bytes(f.read(2), byteorder="little")
         car_dict["Infinity Tune"] = int.from_bytes(f.read(2), byteorder="little")
-        padding = f.read(2)
+        _ = f.read(2)
         car_dict["Numplate Prefecture"] = car_prefectures[int.from_bytes(f.read(1), byteorder="little")]
         car_dict["Numplate Hirigana"] = car_hirigana[int.from_bytes(f.read(1), byteorder="little")]
         car_dict["Numplate Class Code"] = int.from_bytes(f.read(2), byteorder="little")
@@ -257,13 +256,13 @@ def read_card(f):
     data_dict["My Frame"] = int.from_bytes(f.read(1), byteorder="little")
     data_dict["Selected Cup"] = cup_list[int.from_bytes(f.read(1), byteorder="little")]
     data_dict["Tachometer"] = tachometer_list[int.from_bytes(f.read(1), byteorder="little")]
-    padding = f.read(1)
+    _ = f.read(1)
     data_dict["Battle Stance"] = int.from_bytes(f.read(1), byteorder="little")
     data_dict["CRC11"] = pretty_bytes(f.read(2))
-    padding = f.read(2)
+    _ = f.read(2)
     data_dict["Story Losses"] = int.from_bytes(f.read(2), byteorder="little")
     data_dict["Story Wins"] = int.from_bytes(f.read(2), byteorder="little")
-    padding = f.read(6)
+    _ = f.read(6)
     data_dict["Infinity Result Data 1"] = pretty_bytes(f.read(1))
     data_dict["Infinity Result Data 2"] = pretty_bytes(f.read(1))
     data_dict["Infinity Rank"] = int.from_bytes(f.read(2), byteorder="little")
@@ -307,12 +306,12 @@ def read_card(f):
                 rs, sc = True, True
         episodes.append((rs, sc))
     data_dict["Story Progress"] = grouped_dict
-    padding = f.read(5)
+    _ = f.read(5)
     course_dict = dict()
     for i in range(len(courses)):
         course = courses[i]
         course_dict[course] = {"Time": ms_to_time(int.from_bytes(f.read(3), byteorder="little"))}
-        termination = f.read(1)
+        _ = f.read(1)
     data_dict["Courses"] = course_dict
     for i in range(len(courses)):
         course = courses[i]
@@ -326,7 +325,7 @@ def read_card(f):
             course_dict[course]["Car Model"] = model_dict[make][model]
     data_dict["Net VS. Plays"] = int.from_bytes(f.read(4), byteorder="little")
     data_dict["Net Wins"] = int.from_bytes(f.read(4), byteorder="little")
-    padding = f.read(4)
+    _ = f.read(4)
     data_dict["Net Now Count"] = int.from_bytes(f.read(2), byteorder="little")
     data_dict["Net Now Count Wins"] = int.from_bytes(f.read(2), byteorder="little")
     data_dict["Net Count Win Max"] = int.from_bytes(f.read(2), byteorder="little")
@@ -339,21 +338,21 @@ def read_card(f):
     for i in range(len(courses)):
         course = courses[i]
         course_dict[course]["In-Store Wins"] = int.from_bytes(f.read(1), byteorder="little")
-    padding = f.read(4)
+    _ = f.read(4)
     data_dict["Net Tag VS Plays"] = int.from_bytes(f.read(4), byteorder="little")
     data_dict["Net Tag VS Wins"] = int.from_bytes(f.read(4), byteorder="little")
     data_dict["Net Tag VS Now Count"] = int.from_bytes(f.read(2), byteorder="little")
     data_dict["Net Tag VS Now Count Wins"] = int.from_bytes(f.read(2), byteorder="little")
     data_dict["Net Tag VS Count Win Max"] = int.from_bytes(f.read(2), byteorder="little")
-    padding = f.read(6)
+    _ = f.read(6)
     data_dict["Tag Level EXP"] = int.from_bytes(f.read(2), byteorder="little")
     data_dict["Total Bought"] = int.from_bytes(f.read(2), byteorder="little")
     data_dict["CRC12"] = pretty_bytes(f.read(2))
-    padding = f.read(2)
+    _ = f.read(2)
     data_dict["Tag Story Level"] = int.from_bytes(f.read(2), byteorder="little")
     data_dict["Tag Story Progress"] = int.from_bytes(f.read(2), byteorder="little")
     data_dict["Tag Story Lose Count"] = int.from_bytes(f.read(2), byteorder="little")
-    padding = f.read(1)
+    _ = f.read(1)
     data_dict["Tag New Comer"] = bool(int.from_bytes(f.read(1), byteorder="little"))
     data_dict["Tag Story Wins"] = int.from_bytes(f.read(2), byteorder="little")
     course_proficiency_dict = dict()
@@ -400,7 +399,7 @@ def read_card(f):
         tuning_dict[f"Car {i}"] = pretty_bytes(f.read(1))
     data_dict["Car Tunings"] = tuning_dict
     data_dict["Time Release Car Open Flag"] = pretty_bytes(f.read(1))
-    padding = f.read(4)
+    _ = f.read(4)
     data_dict["CRC22"] = pretty_bytes(f.read(2))
     data_dict["Upload Scores"] = True
     return data_dict
@@ -454,7 +453,7 @@ def write_card(f, data_dict, user_id):
     else:
         config_flag_1 += str(data_dict["Wheel Sensitivity"])
     f.write(safe_bytes(config_flag_1, 1))
-    config_flag_2 = f.read(1)
+    _ = f.read(1)
 
     config_flag_3 = '00'
     config_flag_3 += str(data_dict["Ghost Car"])
@@ -493,13 +492,13 @@ def write_card(f, data_dict, user_id):
         f.write(safe_bytes(car_dict["Tuning"], 2))
         f.write(safe_bytes(car_dict["Option Flag"], 2))
         f.write(safe_bytes(car_dict["Car Flag"], 2))
-        padding = f.read(2)
+        _ = f.read(2)
         for j in range(4):
             f.write(safe_bytes(car_dict[f"Event Sticker {j+1}"], 1, signed=True))
         f.write(safe_bytes(car_dict["Battle Wins"], 2))
         f.write(safe_bytes(car_dict["Bought Sequence ID"], 2))
         f.write(safe_bytes(car_dict["Infinity Tune"], 2))
-        padding = f.read(2)
+        _ = f.read(2)
         f.write(safe_bytes(car_prefectures.index(car_dict["Numplate Prefecture"]), 1))
         f.write(safe_bytes(car_hirigana.index(car_dict["Numplate Hirigana"]), 1))
         f.write(safe_bytes(car_dict["Numplate Class Code"], 2))
@@ -511,13 +510,13 @@ def write_card(f, data_dict, user_id):
     f.write(safe_bytes(int(data_dict["My Frame"]), 1))
     f.write(safe_bytes(cup_list.index(data_dict["Selected Cup"]), 1))
     f.write(safe_bytes(tachometer_list.index(data_dict["Tachometer"]), 1))
-    padding = f.read(1)
+    _ = f.read(1)
     f.write(safe_bytes(int(data_dict["Battle Stance"]), 1))
     f.write(safe_bytes(data_dict["CRC11"], 2))
-    padding = f.read(2)
+    _ = f.read(2)
     f.write(safe_bytes(data_dict["Story Losses"], 2))
     f.write(safe_bytes(data_dict["Story Wins"], 2))
-    padding = f.read(6)
+    _ = f.read(6)
     f.write(safe_bytes(data_dict["Infinity Result Data 1"], 1))
     f.write(safe_bytes(data_dict["Infinity Result Data 2"], 1))
     f.write(safe_bytes(int(data_dict["Infinity Rank"]), 2))
@@ -543,12 +542,12 @@ def write_card(f, data_dict, user_id):
         if len(binary_byte) == 8:
             story_progress_bytes.append(int(binary_byte, 2))
     f.write(bytes(story_progress_bytes))
-    padding = f.read(6)
+    _ = f.read(6)
     course_dict = data_dict["Courses"]
     for i in range(len(courses)):
         course = courses[i]
         f.write(safe_bytes(time_to_ms(course_dict[course]["Time"]), 3))
-        termination = f.read(1)
+        _ = f.read(1)
     for i in range(len(courses)):
         course = courses[i]
         if course_dict[course]["Car Model"] == 'Not Played':
@@ -559,7 +558,7 @@ def write_card(f, data_dict, user_id):
             f.write(safe_bytes(make_list.index(course_dict[course]["Car Make"]), 1))
     f.write(safe_bytes(data_dict["Net VS. Plays"], 4))
     f.write(safe_bytes(data_dict["Net Wins"], 4))
-    padding = f.read(4)
+    _ = f.read(4)
     f.write(safe_bytes(data_dict["Net Now Count"], 2))
     f.write(safe_bytes(data_dict["Net Now Count Wins"], 2))
     f.write(safe_bytes(data_dict["Net Count Win Max"], 2))
@@ -572,21 +571,21 @@ def write_card(f, data_dict, user_id):
     for i in range(len(courses)):
         course = courses[i]
         f.write(safe_bytes(course_dict[course]["In-Store Wins"], 1))
-    padding = f.read(4)
+    _ = f.read(4)
     f.write(safe_bytes(data_dict["Net Tag VS Plays"], 4))
     f.write(safe_bytes(data_dict["Net Tag VS Wins"], 4))
     f.write(safe_bytes(data_dict["Net Tag VS Now Count"], 2))
     f.write(safe_bytes(data_dict["Net Tag VS Now Count Wins"], 2))
     f.write(safe_bytes(data_dict["Net Tag VS Count Win Max"], 2))
-    padding = f.read(6)
+    _ = f.read(6)
     f.write(safe_bytes(data_dict["Tag Level EXP"], 2))
     f.write(safe_bytes(data_dict["Total Bought"], 2))
     f.write(safe_bytes(data_dict["CRC12"], 2))
-    padding = f.read(2)
+    _ = f.read(2)
     f.write(safe_bytes(data_dict["Tag Story Level"], 2))
     f.write(safe_bytes(data_dict["Tag Story Progress"], 2))
     f.write(safe_bytes(data_dict["Tag Story Lose Count"], 2))
-    padding = f.read(1)
+    _ = f.read(1)
     f.write(safe_bytes(int(data_dict["Tag New Comer"]), 1))
     f.write(safe_bytes(data_dict["Tag Story Wins"], 2))
     course_proficiency_dict = data_dict["Course Proficiency"]
@@ -622,7 +621,7 @@ def write_card(f, data_dict, user_id):
     for i in range(25):
         f.write(safe_bytes(tuning_dict[f"Car {i}"], 1))
     f.write(safe_bytes(data_dict["Time Release Car Open Flag"], 1))
-    padding = f.read(4)
+    _ = f.read(4)
     f.write(safe_bytes(data_dict["CRC22"], 2))
 
 def create_leaderboard_table():

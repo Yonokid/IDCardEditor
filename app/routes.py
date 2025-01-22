@@ -1,13 +1,29 @@
-from flask import render_template, request, flash, redirect, url_for, send_file, session
-from flask_session import Session
-from werkzeug.utils import secure_filename
-from app import app
-from reader import *
-import hashlib
 import ast
+import hashlib
+import os
+from io import BytesIO
+
 import psycopg2
 from dotenv import load_dotenv
-from io import BytesIO
+from flask import (
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    session,
+    url_for,
+)
+
+from app import app
+from reader import (
+    ms_to_time,
+    read_card,
+    read_txt,
+    time_to_ms,
+    upload_times,
+    write_card,
+)
 
 ALLOWED_EXTENSIONS = {'bin', 'crd'}
 app.jinja_env.globals.update(len=len)
@@ -44,7 +60,6 @@ def upload_file():
             flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
             file_content = file.read()
             header = b'\x03\x36\x00\x01'
             if file_content[:4] != header:
