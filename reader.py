@@ -6,7 +6,7 @@ import random
 import ast
 
 card_version_dict = bidict({"0xFFFF": "4", "0x5210": "5", "0x6013": "6 AA", "0x7012": "7 AAX", "0x8015": "8 Infinity"})
-model_dict = {"Toyota": ["TRUENO GT-APEX (AE86)", "LEVIN GT-APEX (AE86)", "LEVIN SR (AE85)", "86 GT (ZN6)", "MR2 G-Limited (SW20)", "MR-S (ZZW30)", "ALTEZZA RS200 (SXE10)", "SUPRA RZ (JZA80)", "PRIUS (ZVW30)", "SPRINTER TRUENO 2door GT-APEX (AE86)", "CELICA GT-FOUR (ST205)"],
+model_dict = {"Toyota": ["TRUENO GT-APEX (AE86)", "LEVIN GT-APEX (AE86)", "LEVIN SR (AE85)", "86 GT (ZN6)", "ALTEZZA RS200 (SXE10)", "MR-S (ZZW30)", "MR2 G-Limited (SW20)", "SUPRA RZ (JZA80)", "PRIUS (ZVW30)", "SPRINTER TRUENO 2door GT-APEX (AE86)", "CELICA GT-FOUR (ST205)"],
               "Nissan": ["SKYLINE GT-R (BNR32)", "SKYLINE GT-R (BNR34)", "SILVIA K's (S13)", "Silvia Q's (S14)", "Silvia spec-R (S15)", "180SX TYPE II (RPS13)", "FAIRLADY Z (Z33)", "GT-R NISMO (R35)", "GT-R (R35)", "SKYLINE 25GT TURBO (ER34)"],
               "Honda": ["Civic SiR・II (EG6)", "CIVIC TYPE R (EK9)", "INTEGRA TYPE R (DC2)", "S2000 (AP1)", "NSX (NA1)"],
               "Mazda": ["RX-7 ∞III (FC3S)", "RX-7 Type R (FD3S)", "RX-7 Type RS (FD3S)", "RX-8 Type S (SE3P)", "ROADSTER (NA6CE)", "ROADSTER RS (NB8C)"],
@@ -294,7 +294,7 @@ def read_card(f):
             grouped_dict[chapter] = []
         grouped_dict[chapter].append((story, progress, rival))
     for chapter, episodes in grouped_dict.items():
-        rs, sc = None, None
+        rs, sc = False, False
         for episode in episodes:
             progress = episode[1]
             if progress in ('A', 'Not Played'):
@@ -307,8 +307,6 @@ def read_card(f):
                 rs, sc = True, True
         episodes.append((rs, sc))
     data_dict["Story Progress"] = grouped_dict
-    print(grouped_dict)
-
     padding = f.read(5)
     course_dict = dict()
     for i in range(len(courses)):
