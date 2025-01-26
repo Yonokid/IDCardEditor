@@ -3,8 +3,7 @@ body {
   height: 100%;
   margin: 0;
   display: flex;
-  flex-direction: column;
-  background-color: red !important; }
+  flex-direction: column; }
 
 .content {
   flex-grow: 1; }
@@ -19,22 +18,22 @@ footer {
   right: 10px;
   z-index: 1000; }
 
-[data-bs-theme="dark"] .body-bg {
+[data-bs-theme='dark'] .body-bg {
   background-color: #0a121a; }
 
-[data-bs-theme="dark"] .footer-bg {
+[data-bs-theme='dark'] .footer-bg {
   background-color: #080f14; }
 
-[data-bs-theme="dark"] .container-bg {
+[data-bs-theme='dark'] .container-bg {
   background-color: #1a2b36; }
 
-[data-bs-theme="light"] .body-bg {
+[data-bs-theme='light'] .body-bg {
   background-color: #e1f1f7; }
 
-[data-bs-theme="light"] .footer-bg {
+[data-bs-theme='light'] .footer-bg {
   background-color: #f7f9fc; }
 
-[data-bs-theme="light"] .container-bg {
+[data-bs-theme='light'] .container-bg {
   background-color: #d1e1ec; }
 
 .numplate-class-code {
@@ -61,13 +60,12 @@ footer {
   overflow: hidden;
   margin: 0 auto; }
 
-.image-container:hover {
-  cursor: pointer; }
-
 .image-container {
   width: 150px;
   height: 150px;
   margin: 0; }
+  .image-container:hover {
+    cursor: pointer; }
 
 .image-chapter {
   object-fit: contain; }

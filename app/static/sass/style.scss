@@ -5,42 +5,57 @@ body {
   display: flex;
   flex-direction: column;
 }
+
 .content {
   flex-grow: 1;
 }
+
 footer {
   text-align: center;
   padding: 20px;
 }
+
 #darkModeSwitchContainer {
   position: fixed;
   top: 10px;
   right: 10px;
   z-index: 1000;
 }
-[data-bs-theme='dark'] .body-bg {
-  background-color: #0a121a;
+
+[data-bs-theme='dark'] {
+  .body-bg {
+    background-color: #0a121a;
+  }
+
+  .footer-bg {
+    background-color: #080f14;
+  }
+
+  .container-bg {
+    background-color: #1a2b36;
+  }
 }
-[data-bs-theme='dark'] .footer-bg {
-  background-color: #080f14;
+
+[data-bs-theme='light'] {
+  .body-bg {
+    background-color: #e1f1f7;
+  }
+
+  .footer-bg {
+    background-color: #f7f9fc;
+  }
+
+  .container-bg {
+    background-color: #d1e1ec;
+  }
 }
-[data-bs-theme='dark'] .container-bg {
-  background-color: #1a2b36;
-}
-[data-bs-theme='light'] .body-bg {
-  background-color: #e1f1f7;
-}
-[data-bs-theme='light'] .footer-bg {
-  background-color: #f7f9fc;
-}
-[data-bs-theme='light'] .container-bg {
-  background-color: #d1e1ec;
-}
+
 .numplate-class-code {
   font-size: 22px;
   font-weight: bold;
   margin-left: 1px;
 }
+
 .numplate-prefecture {
   font-size: 22px;
   margin-left: 5px;
@@ -56,23 +71,28 @@ footer {
   font-size: 30px;
   font-weight: bold;
 }
+
 .car-license-plate {
   max-width: 150px;
   max-height: 100px;
   overflow: hidden;
   margin: 0 auto;
 }
-.image-container:hover {
-  cursor: pointer;
-}
+
 .image-container {
   width: 150px;
   height: 150px;
   margin: 0;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
+
 .image-chapter {
   object-fit: contain;
 }
+
 .image-episode {
   position: absolute;
   top: 50%;
@@ -81,35 +101,43 @@ footer {
   width: 75%; /* Set the image width to 75% of its original size */
   height: auto; /* Keep the aspect ratio intact */
 }
+
 .image-episode-frame {
   z-index: 2;
   width: 85%;
 }
+
 .image-episode-class {
   top: calc(50% - 45px);
   z-index: 3;
 }
+
 .image-episode-title {
   top: calc(50% + 45px);
   z-index: 3;
 }
+
 .image-episode-rival {
   z-index: 1;
   top: calc(50% - 5px);
 }
+
 .image-summary {
   position: absolute;
   object-fit: contain;
   z-index: 1;
   transform: translate(0px, -25px);
 }
-.select2-container .select2-selection--single .select2-selection__rendered {
-  display: flex;
-  align-items: center;
-}
 
-.select2-container .select2-selection__rendered img {
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
+.select2-container {
+  .select2-selection--single .select2-selection__rendered {
+    display: flex;
+    align-items: center;
+  }
+
+  .select2-selection__rendered img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
 }
