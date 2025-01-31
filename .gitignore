@@ -1,3 +1,4 @@
 .env
 __pycache__
 /app/static/css/
+venv
