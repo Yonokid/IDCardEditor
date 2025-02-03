@@ -97,7 +97,11 @@ def download(name):
         if form_value is not None:
             card[key] = form_value
     new_data = BytesIO(session[name])
-    user_id = card["User ID"]
+    user_id = request.cookies.get('user_id')
+    if user_id:
+        user_id = int(user_id)
+    else:
+        user_id = card["User ID"]
     times = card["Courses"]
     username = card["Driver Name"]
     if card["Upload Scores"]:
@@ -107,6 +111,7 @@ def download(name):
     write_card(new_data, card, new_user_id)
     new_data.seek(0)
     response = send_file(new_data, as_attachment=True, download_name='SBZZ_card.bin')
+    response.set_cookie('user_id', str(new_user_id))
     return response
 
 @app.route('/leaderboard')

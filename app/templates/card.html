@@ -266,12 +266,12 @@
                     {% for i in range(card["Number of Cars"]) %}
                     <div class="col-4 text-center">
                         <h1><b>CAR {{ i + 1}}</b></h1>
-                        <h3>{{ card['Car ' + (i+1)|string]['Make'] }}</h3>
-                        <h5>{{ card['Car ' + (i+1)|string]['Model'] }}</h5>
-                        <img style="width: 410px; height: 230px;"src="{{ url_for('static', filename='D8/Cars/' + card['Car ' + (i+1)|string]['Make'] + '_' + replace(card['Car ' + (i+1)|string]['Model'])) + '_IDAS8' + '.webp' }}">
+                        <h3>{{ card['Cars'][i]['Make'] }}</h3>
+                        <h5>{{ card['Cars'][i]['Model'] }}</h5>
+                        <img style="width: 410px; height: 230px;"src="{{ url_for('static', filename='D8/Cars/' + card['Cars'][i]['Make'] + '_' + replace(card['Cars'][i]['Model'])) + '_IDAS8' + '.webp' }}">
                         <div class="bg-white rounded text-black p-1 car-license-plate">
-                            <p class="justify-content-center align-items-center d-flex" style="margin-bottom: 0px;"><span class="numplate-prefecture">{{ card['Car ' + (i+1)|string]['Numplate Prefecture'] }}</span><span class="numplate-class-code">{{ card['Car ' + (i+1)|string]['Numplate Class Code'] }}</span></p>
-                            <p class="justify-content-center align-items-center d-flex" style="margin-bottom: 0px;"><span class="numplate-hirigana">{{ card['Car ' + (i+1)|string]['Numplate Hirigana'] }}</span> <span class="numplate-plate-number">{{ card['Car ' + (i+1)|string]['Numplate Plate Number'] }}</span></p>
+                            <p class="justify-content-center align-items-center d-flex" style="margin-bottom: 0px;"><span class="numplate-prefecture">{{ card['Cars'][i]['Numplate Prefecture'] }}</span><span class="numplate-class-code">{{ card['Cars'][i]['Numplate Class Code'] }}</span></p>
+                            <p class="justify-content-center align-items-center d-flex" style="margin-bottom: 0px;"><span class="numplate-hirigana">{{ card['Cars'][i]['Numplate Hirigana'] }}</span> <span class="numplate-plate-number">{{ card['Cars'][i]['Numplate Plate Number'] }}</span></p>
                         </div>
                     </div>
                     {% endfor %}
