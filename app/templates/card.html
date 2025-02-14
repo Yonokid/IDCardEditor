@@ -37,7 +37,7 @@
                                 </div>
                                 <input type="hidden" id="key_Wheel Sensitivity" name="key_Wheel Sensitivity" value="{{ card['Wheel Sensitivity'] }}" />
                             </div>
-                            <label for="key_BGM Volume" class="form-label">Home Area:</label>
+                            <label for="key_BGM Volume" class="form-label">BGM Volume:</label>
                             <select id="key_BGM Volume" name="key_BGM Volume" class="form-control">
                                 {% for option in options_map['BGM Volume'] %}
                                     <option value="{{ option }}" {% if card['BGM Volume'] == option %} selected {% endif %}>{{ option }}</option>
