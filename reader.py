@@ -8,11 +8,6 @@ from bidict import bidict
 from typing_extensions import Any
 
 card_version_dict = bidict({b"\xFF\xFF": "4", b"\x10\x52": "5", b"\x13\x60": "6 AA", b"\x12\x70": "7 AAX", b"\x15\x80": "8 Infinity"})
-with open('app/static/D8/Cars/cars.json', 'r') as f:
-    model_dict = json.loads(f.read())
-with open('app/static/D8/Story/story.json', 'r') as f:
-    story_dict = json.loads(f.read())
-card_data = dict()
 
 def read_txt(filename: str) -> list[str]:
     if not filename:
@@ -20,20 +15,6 @@ def read_txt(filename: str) -> list[str]:
     with open(filename, 'r', encoding='utf-8') as file:
         lines = [line.strip() for line in file]
     return lines
-
-prefectures = read_txt('app/static/prefectures.txt')
-avatar_gender_list = read_txt('app/static/avatar_gender.txt')
-bgm_volume_list = read_txt('app/static/bgm_volume.txt')
-make_list = read_txt('app/static/make.txt')
-car_prefectures = read_txt('app/static/car_prefectures.txt')
-car_hirigana = read_txt('app/static/car_hirigana.txt')
-courses = read_txt('app/static/courses.txt')
-cup_list = read_txt('app/static/cup.txt')
-tachometer_list = read_txt('app/static/tachometer.txt')
-aura_list = read_txt('app/static/aura.txt')
-class_list = read_txt('app/static/class.txt')
-title_list = read_txt('app/static/titles.txt')
-course_times_list = read_txt('app/static/times.txt')
 
 def safe_bytes(byte_data, size: int, byteorder='little', signed=False) -> bytes:
     if not byte_data:
@@ -103,7 +84,7 @@ def read_dcoin_info(f: BytesIO) -> list[dict[str, int|bytes]]:
         dcoins.append(dcoin_data)
     return dcoins
 
-def read_cars(f: BytesIO, car_count: int) -> list[dict[str, int|bytes|str]]:
+def read_cars(f: BytesIO, car_count: int, make_list: list[str], car_prefectures: list[str], car_hirigana: list[str], model_dict: dict[str, list[str]]) -> list[dict[str, int|bytes|str]]:
     cars = []
     for i in range(car_count):
         car_dict = dict()
@@ -132,7 +113,7 @@ def read_cars(f: BytesIO, car_count: int) -> list[dict[str, int|bytes|str]]:
         f.read(96)
     return cars
 
-def read_story(f: BytesIO, card_data: dict[str, Any]):
+def read_story(f: BytesIO, card_data: dict[str, Any], story_dict: dict[str, str]):
     story_progress = f.read(23)
     story_progress_list = bytes_to_2bit_strings(story_progress)
     story_progress_list = []
@@ -174,7 +155,7 @@ def read_story(f: BytesIO, card_data: dict[str, Any]):
         episodes.append((rs, sc))
     return grouped_dict
 
-def read_course_cars(f: BytesIO):
+def read_course_cars(f: BytesIO, courses: list[str], make_list: list[str], model_dict: dict[str, list[str]]):
     course_data = dict()
     for i in range(len(courses)):
         course = courses[i]
@@ -192,7 +173,7 @@ def read_course_cars(f: BytesIO):
             course_data[course]["Car Model"] = model_dict[make][model]
     return course_data
 
-def read_course_times(f: BytesIO, course_data, course_count: int) -> dict[str, int|str]:
+def read_course_times(f: BytesIO, course_data, courses: list[str], course_count: int, course_times_list: list[str]) -> dict[str, int|str]:
     for i in range(course_count):
         course = courses[i]
         lap_1 = int.from_bytes(f.read(2), byteorder="big")
@@ -209,7 +190,7 @@ def read_course_times(f: BytesIO, course_data, course_count: int) -> dict[str, i
         course_data[course]["Time to Platinum"] = f'{ms_to_time(total - time_to_ms(course_builtin_times[2]))}\n({course_builtin_times[2]})'
     return course_data
 
-def read_course_proficiency(f: BytesIO, card_data: dict[str, Any]):
+def read_course_proficiency(f: BytesIO, card_data: dict[str, Any], courses: list[str]):
     course_proficiency_dict = dict()
     for i in range(16):
         course = courses[i*2]
@@ -222,9 +203,76 @@ def read_tunings(f: BytesIO, card_data) -> dict[str, bytes]:
         tuning_dict[f"Car {i}"] = f.read(1)
     return tuning_dict
 
-def read_card(f: BytesIO) -> dict[str, Any]:
-    _ = f.read(80)
-    card_data["Game Version"] = card_version_dict[f.read(2)]
+def read_card_id6(f: BytesIO, card_data) -> dict[str, Any]:
+    prefectures = read_txt('app/static/D6/prefectures.txt')
+    avatar_gender_list = read_txt('app/static/D6/avatar_gender.txt')
+    bgm_volume_list = read_txt('app/static/D8/bgm_volume.txt')
+    class_list = read_txt('app/static/D8/class.txt')
+    make_list = read_txt('app/static/D8/make.txt')
+    car_prefectures = read_txt('app/static/D8/car_prefectures.txt')
+    car_hirigana = read_txt('app/static/D8/car_hirigana.txt')
+    with open('app/static/D6/cars.json', 'r') as j:
+        model_dict = json.loads(j.read())
+
+    card_data["Issued Store"] = f.read(2)
+    card_data["User ID"] = int.from_bytes(f.read(4), byteorder="little", signed=True)
+    card_data["Home Area"] = prefectures[int.from_bytes(f.read(2), byteorder="little")]
+    card_data["Avatar Gender"] = avatar_gender_list[int.from_bytes(f.read(2), byteorder="little")]
+    card_data["Previous Card ID"] = int.from_bytes(f.read(4), byteorder="little")
+    _ = f.read(32)
+    card_data["Store Name"] = (f.read(32).rstrip(b'\x00')).decode('shift-jis')
+    config_flag_1 = int.from_bytes(f.read(1))
+    card_data["Wheel Sensitivity"] = config_flag_1 % 16
+    card_data["BGM Volume"] = bgm_volume_list[config_flag_1 // 16]
+    config_flag_2 = f.read(1)  # noqa: F841
+    config_flag_3 = int.from_bytes(f.read(1))
+    card_data["Force Quit"] = config_flag_3 & 1
+    card_data["Cornering Guide"] = (config_flag_3 >> 1) & 1
+    card_data["Guide Line"] = (config_flag_3 >> 2) & 1
+    card_data["Cup"] = (config_flag_3 >> 3) & 1
+    card_data["Barricade"] = (config_flag_3 >> 4) & 1
+    card_data["Ghost Car"] = (config_flag_3 >> 5) & 1
+    card_data["Class"] = class_list[int.from_bytes(f.read(1), byteorder="little")-1]
+    _ = f.read(2)
+    card_data["Current Car"] = int.from_bytes(f.read(1), byteorder="little")
+    card_data["Number of Cars"] = int.from_bytes(f.read(1), byteorder="little")
+    card_data["Play Count"] = int.from_bytes(f.read(2), byteorder="little")
+    card_data["Pride Points"] = int.from_bytes(f.read(2), byteorder="little")
+    card_data["Tag Pride Points"] = int.from_bytes(f.read(2), byteorder="little")
+    card_data["Class Gauge"] = int.from_bytes(f.read(2), byteorder="little")
+    card_data["Team ID"] = int.from_bytes(f.read(4), byteorder="little", signed=True)
+    card_data["First Card ID"] = f.read(4)
+    card_data["Team Flag"] = f.read(4)
+    card_data["Driver Flags"] = f.read(4)
+    card_data["Driver Points"] = int.from_bytes(f.read(4), byteorder="little")
+    card_data["Avatar"] = read_avatar_parts(f.read(12))
+    card_data["API Request Header"] = f.read(6)
+    card_data["User ID (HTTP)"] = f.read(4)
+    card_data["Access Code"] = (f.read(22).rstrip(b'\x00')).decode('shift-jis')
+    card_data["Driver Name"] = (f.read(14).rstrip(b'\x00')).decode('shift-jis')
+    card_data["CRC01"] = f.read(2)
+    card_data["Cars"] = read_cars(f, card_data["Number of Cars"], make_list, car_prefectures, car_hirigana, model_dict)
+    return card_data
+
+def read_card_id8(f: BytesIO, card_data) -> dict[str, Any]:
+    prefectures = read_txt('app/static/D8/prefectures.txt')
+    avatar_gender_list = read_txt('app/static/D8/avatar_gender.txt')
+    bgm_volume_list = read_txt('app/static/D8/bgm_volume.txt')
+    make_list = read_txt('app/static/D8/make.txt')
+    car_prefectures = read_txt('app/static/D8/car_prefectures.txt')
+    car_hirigana = read_txt('app/static/D8/car_hirigana.txt')
+    courses = read_txt('app/static/D8/courses.txt')
+    cup_list = read_txt('app/static/D8/cup.txt')
+    tachometer_list = read_txt('app/static/D8/tachometer.txt')
+    aura_list = read_txt('app/static/D8/aura.txt')
+    class_list = read_txt('app/static/D8/class.txt')
+    title_list = read_txt('app/static/D8/titles.txt')
+    course_times_list = read_txt('app/static/D8/times.txt')
+    with open('app/static/D8/cars.json', 'r') as j:
+        model_dict = json.loads(j.read())
+    with open('app/static/D8/Story/story.json', 'r') as j:
+        story_dict = json.loads(j.read())
+
     card_data["Issued Store"] = f.read(2)
     card_data["User ID"] = int.from_bytes(f.read(4), byteorder="little", signed=True)
     card_data["Home Area"] = prefectures[int.from_bytes(f.read(2), byteorder="little")]
@@ -244,8 +292,8 @@ def read_card(f: BytesIO) -> dict[str, Any]:
     card_data["Barricade"] = (config_flag_3 >> 4) & 1
     card_data["Ghost Car"] = (config_flag_3 >> 5) & 1
     card_data["Class"] = class_list[int.from_bytes(f.read(1), byteorder="little")-1]
-    card_data["Class (Match)"] = class_list[int.from_bytes(f.read(1), byteorder="little")]
-    card_data["Class (Tag Match)"] = class_list[int.from_bytes(f.read(1), byteorder="little")]
+    card_data["Class (Match)"] = class_list[int.from_bytes(f.read(1), byteorder="little")-1]
+    card_data["Class (Tag Match)"] = class_list[int.from_bytes(f.read(1), byteorder="little")-1]
     card_data["Current Car"] = int.from_bytes(f.read(1), byteorder="little")
     card_data["Number of Cars"] = int.from_bytes(f.read(1), byteorder="little")
     card_data["Play Count"] = int.from_bytes(f.read(2), byteorder="little")
@@ -258,10 +306,11 @@ def read_card(f: BytesIO) -> dict[str, Any]:
     card_data["Driver Flags"] = f.read(4)
     card_data["Driver Points"] = int.from_bytes(f.read(4), byteorder="little")
     card_data["Avatar"] = read_avatar_parts(f.read(12))
-    _ = f.read(32)
+    _ = f.read(10)
+    card_data["Access Code"] = (f.read(22).rstrip(b'\x00')).decode('shift-jis')
     card_data["Driver Name"] = (f.read(14).rstrip(b'\x00')).decode('shift-jis')
     card_data["CRC01"] = f.read(2)
-    card_data["Cars"] = read_cars(f, card_data["Number of Cars"])
+    card_data["Cars"] = read_cars(f, card_data["Number of Cars"], make_list, car_prefectures, car_hirigana, model_dict)
     card_data["Avatar Points"] = int.from_bytes(f.read(1), byteorder="little")
     card_data["My Frame"] = int.from_bytes(f.read(1), byteorder="little")
     card_data["Selected Cup"] = cup_list[int.from_bytes(f.read(1), byteorder="little")]
@@ -276,9 +325,9 @@ def read_card(f: BytesIO) -> dict[str, Any]:
     card_data["Infinity Result Data 1"] = f.read(1)
     card_data["Infinity Result Data 2"] = f.read(1)
     card_data["Infinity Rank"] = int.from_bytes(f.read(2), byteorder="little")
-    card_data["Story Progress"] = read_story(f, card_data)
+    card_data["Story Progress"] = read_story(f, card_data, story_dict)
     _ = f.read(5)
-    card_data["Courses"] = read_course_cars(f)
+    card_data["Courses"] = read_course_cars(f, courses, make_list, model_dict)
     card_data["Net VS. Plays"] = int.from_bytes(f.read(4), byteorder="little")
     card_data["Net Wins"] = int.from_bytes(f.read(4), byteorder="little")
     _ = f.read(4)
@@ -310,7 +359,7 @@ def read_card(f: BytesIO) -> dict[str, Any]:
     _ = f.read(1)
     card_data["Tag New Comer"] = bool(int.from_bytes(f.read(1), byteorder="little"))
     card_data["Tag Story Wins"] = int.from_bytes(f.read(2), byteorder="little")
-    card_data["Course Proficiency"] = read_course_proficiency(f, card_data)
+    card_data["Course Proficiency"] = read_course_proficiency(f, card_data, courses)
     card_data["Pro D Mission Flag 0"] = f.read(2)
     card_data["Pro D Mission Flag 1"] = f.read(2)
     card_data["Pro D Mission Flag 2"] = f.read(2)
@@ -333,13 +382,27 @@ def read_card(f: BytesIO) -> dict[str, Any]:
     card_data["Parts Stocker Position 0"] = int.from_bytes(f.read(1), byteorder="little", signed=True)
     card_data["Parts Stocker Position 1"] = int.from_bytes(f.read(1), byteorder="little", signed=True)
     card_data["CRC21"] = f.read(2)
-    card_data["Courses"] = read_course_times(f, card_data["Courses"], len(courses))
+    card_data["Courses"] = read_course_times(f, card_data["Courses"], courses, len(courses), course_times_list)
     card_data["Car Tunings"] = read_tunings(f, card_data)
     card_data["Time Release Car Open Flag"] = f.read(1)
     _ = f.read(4)
     card_data["CRC22"] = f.read(2)
     card_data["Upload Scores"] = True
     return card_data
+
+def read_card(f: BytesIO) -> dict[str, Any]:
+    card_data = dict()
+    _ = f.read(80)
+    card_data["Game Version"] = card_version_dict[f.read(2)]
+    game_ver = card_data["Game Version"]
+    match game_ver:
+        case '8 Infinity':
+            return read_card_id8(f, card_data)
+        case '6 AA':
+            return read_card_id6(f, card_data)
+        case _:
+            raise Exception('Card Version not matched')
+
 
 def write_avatar_parts(part_list: list[int]) -> bytes:
     byte_list = [0] * 11
@@ -387,6 +450,21 @@ def write_dcoin_info(dcoin_data) -> bytes:
     return byte_data
 
 def write_card(f, card_data: dict, user_id: int) -> None:
+    prefectures = read_txt('app/static/D8/prefectures.txt')
+    avatar_gender_list = read_txt('app/static/D8/avatar_gender.txt')
+    bgm_volume_list = read_txt('app/static/D8/bgm_volume.txt')
+    make_list = read_txt('app/static/D8/make.txt')
+    car_prefectures = read_txt('app/static/D8/car_prefectures.txt')
+    car_hirigana = read_txt('app/static/D8/car_hirigana.txt')
+    courses = read_txt('app/static/D8/courses.txt')
+    cup_list = read_txt('app/static/D8/cup.txt')
+    tachometer_list = read_txt('app/static/D8/tachometer.txt')
+    aura_list = read_txt('app/static/D8/aura.txt')
+    class_list = read_txt('app/static/D8/class.txt')
+    title_list = read_txt('app/static/D8/titles.txt')
+    with open('app/static/D8/cars.json', 'r') as j:
+        model_dict = json.loads(j.read())
+
     f.seek(80)
     f.write(safe_bytes(card_version_dict.inverse.get(card_data["Game Version"]), 2, byteorder='little'))
     f.write(safe_bytes(card_data["Issued Store"], 2, byteorder='little'))
