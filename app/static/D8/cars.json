@@ -1,73 +1,66 @@
 {
-  "Toyota": [
-    "TRUENO GT-APEX (AE86)",
-    "LEVIN GT-APEX (AE86)",
-    "LEVIN SR (AE85)",
-<<<<<<< Updated upstream:app/static/D8/Cars/cars.json
-    "MR2 G-Limited (SW20)",
-    "ALTEZZA RS200 (SXE10)",
-    "MR-S (ZZW30)",
-    "SUPRA RZ (JZA80)",
-=======
-    "SUPRA RZ (JZA80)",
-    "ALTEZZA RS200 (SXE10)",
-    "MR-S (ZZW30)",
-    "MR2 G-Limited (SW20)",
->>>>>>> Stashed changes:app/static/D8/cars.json
-    "86 GT (ZN6)",
-    "PRIUS (ZVW30)",
-    "SPRINTER TRUENO 2door GT-APEX (AE86)",
-    "CELICA GT-FOUR (ST205)"
-  ],
-  "Nissan": [
-    "SKYLINE GT-R (BNR32)",
-    "SKYLINE GT-R (BNR34)",
-    "SILVIA K's (S13)",
-    "Silvia Q's (S14)",
-    "Silvia spec-R (S15)",
-    "180SX TYPE II (RPS13)",
-    "FAIRLADY Z (Z33)",
-    "GT-R NISMO (R35)",
-    "SKYLINE 25GT TURBO (ER34)"
-  ],
-  "Honda": [
-    "Civic SiR\u30fbII (EG6)",
-    "CIVIC TYPE R (EK9)",
-    "INTEGRA TYPE R (DC2)",
-    "S2000 (AP1)",
-    "NSX (NA1)"
-  ],
-  "Mazda": [
-    "RX-7 \u221eIII (FC3S)",
-    "RX-7 Type R (FD3S)",
-    "RX-8 Type S (SE3P)",
-    "ROADSTER (NA6CE)",
-    "ROADSTER RS (NB8C)",
-    "RX-7 Type RS (FD3S)",
-  ],
-  "Subaru": [
-    "IMPREZA STi Ver.V (GC8)",
-    "IMPREZA STI (GDBF)",
-    "IMPREZA STi (GDBA)",
-    "BRZ S (ZC6)"
-  ],
-  "Mitsubishi": [
-    "LANCER Evolution III (CE9A)",
-    "LANCER EVOLUTION IV (CN9A)",
-    "LANCER Evolution IX (CT9A)",
-    "LANCER Evolution VII (CT9A)",
-    "LANCER EVOLUTION X (CZ4A)",
-    "LANCER GSR EVOLUTION VI T.M.EDITION (CP9A)",
-    "LANCER RS EVOLUTION V (CP9A)"
-  ],
-  "Suzuki": ["Cappuccino (EA11R)"],
-  "Initial D": ["SILEIGHTY"],
-  "Complete": [
-    "RE Amemiya Genki-7 (FD3S)",
-    "MONSTER CIVIC R (EK9)",
-    "S2000 GT1 (AP1)",
-    "G-FORCE SUPRA (JZA80-kai)",
-    "ROADSTER C-SPEC (NA8C Kai)",
-    "NSX-R GT (NA2)",
-  ]
+    "Toyota": [
+        "TRUENO GT-APEX (AE86)",
+        "LEVIN GT-APEX (AE86)",
+        "LEVIN SR (AE85)",
+        "MR2 G-Limited (SW20)",
+        "ALTEZZA RS200 (SXE10)",
+        "MR-S (ZZW30)",
+        "SUPRA RZ (JZA80)",
+        "86 GT (ZN6)",
+        "PRIUS (ZVW30)",
+        "SPRINTER TRUENO 2door GT-APEX (AE86)",
+        "CELICA GT-FOUR (ST205)"
+    ],
+    "Nissan": [
+        "SKYLINE GT-R (BNR32)",
+        "SKYLINE GT-R (BNR34)",
+        "SILVIA K's (S13)",
+        "Silvia Q's (S14)",
+        "Silvia spec-R (S15)",
+        "180SX TYPE II (RPS13)",
+        "FAIRLADY Z (Z33)",
+        "GT-R NISMO (R35)",
+        "SKYLINE 25GT TURBO (ER34)"
+    ],
+    "Honda": [
+        "Civic SiR\u30fbII (EG6)",
+        "CIVIC TYPE R (EK9)",
+        "INTEGRA TYPE R (DC2)",
+        "S2000 (AP1)",
+        "NSX (NA1)"
+    ],
+    "Mazda": [
+        "RX-7 \u221eIII (FC3S)",
+        "RX-7 Type R (FD3S)",
+        "RX-8 Type S (SE3P)",
+        "ROADSTER (NA6CE)",
+        "ROADSTER RS (NB8C)",
+        "RX-7 Type RS (FD3S)"
+    ],
+    "Subaru": [
+        "IMPREZA STi Ver.V (GC8)",
+        "IMPREZA STI (GDBF)",
+        "IMPREZA STi (GDBA)",
+        "BRZ S (ZC6)"
+    ],
+    "Mitsubishi": [
+        "LANCER Evolution III (CE9A)",
+        "LANCER EVOLUTION IV (CN9A)",
+        "LANCER Evolution IX (CT9A)",
+        "LANCER Evolution VII (CT9A)",
+        "LANCER EVOLUTION X (CZ4A)",
+        "LANCER GSR EVOLUTION VI T.M.EDITION (CP9A)",
+        "LANCER RS EVOLUTION V (CP9A)"
+    ],
+    "Suzuki": ["Cappuccino (EA11R)"],
+    "Initial D": ["SILEIGHTY"],
+    "Complete": [
+        "RE Amemiya Genki-7 (FD3S)",
+        "MONSTER CIVIC R (EK9)",
+        "S2000 GT1 (AP1)",
+        "G-FORCE SUPRA (JZA80-kai)",
+        "ROADSTER C-SPEC (NA8C Kai)",
+        "NSX-R GT (NA2)"
+    ]
 }
